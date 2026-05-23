@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Digimap Roxy Square Jember</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap');
+    body { font-family: 'Plus Jakarta Sans', sans-serif; background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%); min-height: 100vh; color: #1e293b; }
+    .glass-card { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border-radius: 1.5rem; box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.1); }
+    .btn-black { background: #000; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+    .btn-black:hover:not(:disabled) { transform: translateY(-3px); box-shadow: 0 15px 30px rgba(0,0,0,0.3); }
+    .animate-in { animation: fadeIn 0.4s ease-out; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    .pin-box { width: 60px; height: 70px; text-align: center; font-size: 28px; font-weight: 900; border: 2px solid #e2e8f0; border-radius: 12px; background: #f8fafc; -moz-appearance: textfield; transition: all 0.2s; }
+    .pin-box::-webkit-outer-spin-button, .pin-box::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+    .pin-box:focus { outline: none; border-color: #000; background: #fff; transform: scale(1.05); }
+    input[type="number"]::-webkit-inner-spin-button, input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+  </style>
+</head>
+<body class="flex items-center justify-center p-4">
+
+  <div id="view_login" class="glass-card w-full max-w-md p-8 my-4 hidden">
+    <div class="text-center mb-6">
+      <div class="inline-block p-4 bg-black rounded-2xl mb-3"><i class="fas fa-store text-white text-3xl"></i></div>
+      <h2 class="text-2xl font-extrabold text-gray-800 tracking-tight">Digimap</h2>
+      <p class="text-sm font-bold text-gray-500">Roxy Square Jember</p>
+    </div>
+    <div class="space-y-5">
+      <div>
+        <label class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Pilih Nama</label>
+        <div class="relative">
+          <select id="login_nama" class="w-full p-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-black bg-gray-50 font-bold text-gray-700 cursor-pointer appearance-none transition-all">
+            <option value="">-- Memuat... --</option>
+          </select>
+          <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-400"><i class="fas fa-chevron-down"></i></div>
+        </div>
+      </div>
+      <div>
+        <label class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-3 text-center">Masukkan PIN</label>
+        <div class="flex justify-center gap-3" id="pin_container">
+          <input type="number" inputmode="numeric" maxlength="1" class="pin-box" data-idx="0">
+          <input type="number" inputmode="numeric" maxlength="1" class="pin-box" data-idx="1">
+          <input type="number" inputmode="numeric" maxlength="1" class="pin-box" data-idx="2">
+          <input type="number" inputmode="numeric" maxlength="1" class="pin-box" data-idx="3">
+        </div>
+      </div>
+      <button id="btn_login" onclick="doLogin()" class="w-full btn-black text-white font-black py-4 rounded-xl shadow-xl disabled:opacity-50 uppercase tracking-widest text-sm flex items-center justify-center gap-3">
+        <span>Masuk</span><i class="fas fa-arrow-right"></i>
+      </button>
+    </div>
+  </div>
+
+  <div id="view_app" class="glass-card w-full max-w-lg p-6 my-4 hidden">
+    <div class="flex justify-between items-center mb-4 border-b border-gray-100 pb-4">
+      <div>
+        <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Selamat datang,</p>
+        <p id="user_name" class="text-lg font-extrabold text-gray-800">-</p>
+      </div>
+      <button onclick="doLogout()" class="text-xs font-bold text-red-500 hover:text-red-700 transition-all px-3 py-2 rounded-lg hover:bg-red-50">
+        <i class="fas fa-sign-out-alt"></i> Logout
+      </button>
+    </div>
+
+    <div class="flex gap-1 mb-6 p-1 bg-gray-100 rounded-2xl border border-gray-200 overflow-x-auto">
+      <button id="nav_input" onclick="switchTab('input')" class="flex-1 py-3 px-2 text-[9px] font-black uppercase tracking-widest rounded-xl bg-slate-800 text-white shadow-md transition-all whitespace-nowrap"><i class="fas fa-edit"></i> Input</button>
+      <button id="nav_history" onclick="switchTab('history')" class="flex-1 py-3 px-2 text-[9px] font-black uppercase tracking-widest rounded-xl text-gray-500 hover:text-slate-800 transition-all whitespace-nowrap"><i class="fas fa-history"></i> Histori</button>
+      <button id="nav_rank" onclick="switchTab('rank')" class="flex-1 py-3 px-2 text-[9px] font-black uppercase tracking-widest rounded-xl text-gray-500 hover:text-slate-800 transition-all whitespace-nowrap"><i class="fas fa-trophy"></i> Rank</button>
+      <button id="nav_chart" onclick="switchTab('chart')" class="flex-1 py-3 px-2 text-[9px] font-black uppercase tracking-widest rounded-xl text-gray-500 hover:text-slate-800 transition-all whitespace-nowrap"><i class="fas fa-chart-line"></i> Grafik</button>
+    </div>
+
+    <div id="view_input" class="animate-in">
+      <div class="space-y-4">
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-[10px] font-bold text-gray-500 uppercase mb-1 ml-1">Device</label>
+            <div class="relative"><span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 font-bold text-sm">Rp</span><input type="text" id="val_device" class="uang-input w-full pl-9 pr-3 py-3 bg-gray-50 rounded-xl border-2 border-gray-200 text-sm font-black text-gray-800 focus:outline-none focus:border-blue-500 transition-all text-right" placeholder="0"></div>
+          </div>
+          <div>
+            <label class="block text-[10px] font-bold text-gray-500 uppercase mb-1 ml-1">Accessories</label>
+            <div class="relative"><span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 font-bold text-sm">Rp</span><input type="text" id="val_accessories" class="uang-input w-full pl-9 pr-3 py-3 bg-gray-50 rounded-xl border-2 border-gray-200 text-sm font-black text-gray-800 focus:outline-none focus:border-blue-500 transition-all text-right" placeholder="0"></div>
+          </div>
+          <div>
+            <label class="block text-[10px] font-bold text-gray-500 uppercase mb-1 ml-1">Qoala</label>
+            <div class="relative"><span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 font-bold text-sm">Rp</span><input type="text" id="val_qoala" class="uang-input w-full pl-9 pr-3 py-3 bg-gray-50 rounded-xl border-2 border-gray-200 text-sm font-black text-gray-800 focus:outline-none focus:border-blue-500 transition-all text-right" placeholder="0"></div>
+          </div>
+          <div>
+            <label class="block text-[10px] font-bold text-gray-500 uppercase mb-1 ml-1">Telkomsel</label>
+            <div class="relative"><span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 font-bold text-sm">Rp</span><input type="text" id="val_telkomsel" class="uang-input w-full pl-9 pr-3 py-3 bg-gray-50 rounded-xl border-2 border-gray-200 text-sm font-black text-gray-800 focus:outline-none focus:border-blue-500 transition-all text-right" placeholder="0"></div>
+          </div>
+          <div>
+            <label class="block text-[10px] font-bold text-gray-500 uppercase mb-1 ml-1">Indosat</label>
+            <div class="relative"><span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 font-bold text-sm">Rp</span><input type="text" id="val_indosat" class="uang-input w-full pl-9 pr-3 py-3 bg-gray-50 rounded-xl border-2 border-gray-200 text-sm font-black text-gray-800 focus:outline-none focus:border-blue-500 transition-all text-right" placeholder="0"></div>
+          </div>
+          <div>
+            <label class="block text-[10px] font-bold text-gray-500 uppercase mb-1 ml-1">XL</label>
+            <div class="relative"><span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 font-bold text-sm">Rp</span><input type="text" id="val_xl" class="uang-input w-full pl-9 pr-3 py-3 bg-gray-50 rounded-xl border-2 border-gray-200 text-sm font-black text-gray-800 focus:outline-none focus:border-blue-500 transition-all text-right" placeholder="0"></div>
+          </div>
+        </div>
+
+        <div class="p-3 bg-orange-50 rounded-xl border border-orange-100">
+          <label class="block text-[10px] font-bold text-orange-600 uppercase mb-1 ml-1">Airpods (Qty)</label>
+          <div class="relative">
+            <input type="number" id="val_airpods" class="w-full pl-4 pr-10 py-3 bg-white rounded-xl border border-orange-200 text-sm font-black text-gray-800 focus:outline-none focus:border-orange-500 transition-all" placeholder="Jumlah unit">
+            <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-orange-400"><i class="fas fa-headphones"></i></div>
+          </div>
+        </div>
+
+        <div class="mt-2 p-5 bg-slate-800 rounded-2xl shadow-inner flex justify-between items-center">
+          <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Total Pemasukan</p>
+          <p id="total_display" class="text-2xl font-black text-white">Rp 0</p>
+        </div>
+
+        <button id="btn_submit" onclick="submitForm()" class="w-full btn-black text-white font-black py-4 rounded-xl shadow-xl disabled:opacity-50 uppercase tracking-widest text-sm flex items-center justify-center gap-3">
+          <span>Simpan Data</span><i class="fas fa-save"></i>
+        </button>
+      </div>
+    </div>
+
+    <div id="view_history" class="hidden animate-in">
+      <div class="flex justify-between items-center mb-4 px-1">
+        <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Ketuk nilai untuk edit</p>
+        <select id="limit_history" onchange="loadHistory()" class="bg-gray-100 border border-gray-200 text-xs font-bold rounded-lg px-2 py-1 outline-none text-gray-700">
+          <option value="20">20 Data</option><option value="50">50 Data</option><option value="100">100 Data</option>
+        </select>
+      </div>
+      <div id="history_container" class="space-y-3 max-h-[60vh] overflow-y-auto pr-1">
+        <p class="text-center text-gray-400 py-10"><i class="fas fa-spinner fa-spin text-2xl"></i></p>
+      </div>
+    </div>
+
+    <div id="view_rank" class="hidden animate-in">
+      <div id="rank_container" class="space-y-3 max-h-[60vh] overflow-y-auto pr-1">
+        <p class="text-center text-gray-400 py-10"><i class="fas fa-spinner fa-spin text-2xl"></i></p>
+      </div>
+    </div>
+
+    <div id="view_chart" class="hidden animate-in">
+      <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
+        <h2 class="text-sm font-bold text-gray-800 mb-4 text-center">Penjualan Bulanan (Rp)</h2>
+        <canvas id="monthlyChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API_URL = 'GANTI_DENGAN_URL_WEB_APP_APPS_SCRIPT_ANDA';
+    const SESSION_KEY = 'digimap_session';
+    let myChart = null;
+    const formatRp = (n) => new Intl.NumberFormat('id-ID', { minimumFractionDigits: 0 }).format(n);
+
+    async function api(action, payload = {}) {
+      try {
+        const fd = new FormData();
+        fd.append('action', action);
+        fd.append('payload', JSON.stringify(payload));
+        const res = await fetch(API_URL, { method: 'POST', body: fd, redirect: 'follow' });
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        return await res.json();
+      } catch (err) { throw new Error('Koneksi gagal: ' + err.message); }
+    }
+
+    window.onload = function() {
+      const s = getSession();
+      if (s && s.nama) showApp(s.nama); else showLogin();
+    };
+    function getSession() { try { return JSON.parse(localStorage.getItem(SESSION_KEY)); } catch(e) { return null; } }
+    function setSession(nama) { localStorage.setItem(SESSION_KEY, JSON.stringify({ nama, loginAt: new Date().toISOString() })); }
+    function clearSession() { localStorage.removeItem(SESSION_KEY); }
+
+    function showLogin() {
+      document.getElementById('view_app').classList.add('hidden');
+      document.getElementById('view_login').classList.remove('hidden');
+      loadMembers(); setupPinInputs();
+    }
+    async function loadMembers() {
+      const select = document.getElementById('login_nama');
+      try {
+        const data = await api('getMembers');
+        select.innerHTML = '<option value="">-- Pilih Nama --</option>';
+        data.forEach(n => { const o = document.createElement('option'); o.value = n; o.textContent = n; select.appendChild(o); });
+      } catch (err) { Swal.fire('Error', err.message, 'error'); }
+    }
+    function setupPinInputs() {
+      const boxes = document.querySelectorAll('.pin-box');
+      boxes.forEach((box, i) => {
+        box.value = '';
+        box.oninput = function() { this.value = this.value.replace(/\D/g, '').slice(0, 1); if (this.value && i < boxes.length - 1) boxes[i + 1].focus(); };
+        box.onkeydown = function(e) { if (e.key === 'Backspace' && !this.value && i > 0) boxes[i - 1].focus(); if (e.key === 'Enter') doLogin(); };
+      });
+      setTimeout(() => boxes[0].focus(), 100);
+    }
+    function getPinValue() { return Array.from(document.querySelectorAll('.pin-box')).map(b => b.value).join(''); }
+
+    async function doLogin() {
+      const nama = document.getElementById('login_nama').value;
+      const pin = getPinValue();
+      if (!nama) return Swal.fire('Oops!', 'Pilih nama dulu.', 'warning');
+      if (pin.length !== 4) return Swal.fire('Oops!', 'PIN harus 4 digit.', 'warning');
+      const btn = document.getElementById('btn_login');
+      const ori = btn.innerHTML;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memeriksa...'; btn.disabled = true;
+      try {
+        const res = await api('validateLogin', { nama, pin });
+        if (res.success) {
+          setSession(res.nama);
+          Swal.fire({ title: 'Berhasil!', text: 'Selamat datang, ' + res.nama, icon: 'success', timer: 1200, showConfirmButton: false })
+            .then(() => showApp(res.nama));
+        } else {
+          Swal.fire('Login Gagal', res.message, 'error');
+          document.querySelectorAll('.pin-box').forEach(b => b.value = '');
+          document.querySelectorAll('.pin-box')[0].focus();
+        }
+      } catch (err) { Swal.fire('Error', err.message, 'error'); }
+      finally { btn.innerHTML = ori; btn.disabled = false; }
+    }
+
+    function showApp(nama) {
+      document.getElementById('view_login').classList.add('hidden');
+      document.getElementById('view_app').classList.remove('hidden');
+      document.getElementById('user_name').innerText = nama;
+      setupUangInputs();
+      switchTab('input');
+    }
+    function doLogout() {
+      Swal.fire({ title: 'Logout?', text: 'Yakin mau keluar?', icon: 'question', showCancelButton: true, confirmButtonText: 'Ya, Logout', cancelButtonText: 'Batal', confirmButtonColor: '#dc2626' })
+        .then(res => { if (res.isConfirmed) { clearSession(); showLogin(); } });
+    }
+
+    function switchTab(tab) {
+      const unsel = "flex-1 py-3 px-2 text-[9px] font-black uppercase tracking-widest rounded-xl text-gray-500 hover:text-slate-800 transition-all whitespace-nowrap";
+      const sel = "flex-1 py-3 px-2 text-[9px] font-black uppercase tracking-widest rounded-xl bg-slate-800 text-white shadow-md transition-all whitespace-nowrap";
+      ['input','history','rank','chart'].forEach(t => {
+        document.getElementById('view_' + t).classList.add('hidden');
+        document.getElementById('nav_' + t).className = unsel;
+      });
+      document.getElementById('view_' + tab).classList.remove('hidden');
+      document.getElementById('nav_' + tab).className = sel;
+      if (tab === 'history') loadHistory();
+      if (tab === 'rank') loadRank();
+      if (tab === 'chart') loadChart();
+    }
+
+    function setupUangInputs() {
+      document.querySelectorAll('.uang-input').forEach(input => {
+        input.oninput = function() {
+          let v = this.value.replace(/[^,\d]/g, '');
+          this.value = v ? parseInt(v, 10).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".") : "";
+          hitungTotal();
+        };
+      });
+    }
+    function cleanNumber(str) { return str ? Number(str.replace(/\./g, '')) : 0; }
+    function hitungTotal() {
+      const t = cleanNumber(document.getElementById('val_device').value)
+              + cleanNumber(document.getElementById('val_accessories').value)
+              + cleanNumber(document.getElementById('val_qoala').value)
+              + cleanNumber(document.getElementById('val_telkomsel').value)
+              + cleanNumber(document.getElementById('val_indosat').value)
+              + cleanNumber(document.getElementById('val_xl').value);
+      document.getElementById('total_display').innerText = 'Rp ' + formatRp(t);
+      return t;
+    }
+
+    async function submitForm() {
+      const session = getSession();
+      if (!session) return doLogout();
+      const btn = document.getElementById('btn_submit');
+      const ori = btn.innerHTML;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...'; btn.disabled = true;
+      const payload = {
+        nama: session.nama,
+        device: cleanNumber(document.getElementById('val_device').value),
+        accessories: cleanNumber(document.getElementById('val_accessories').value),
+        qoala: cleanNumber(document.getElementById('val_qoala').value),
+        telkomsel: cleanNumber(document.getElementById('val_telkomsel').value),
+        indosat: cleanNumber(document.getElementById('val_indosat').value),
+        xl: cleanNumber(document.getElementById('val_xl').value),
+        airpods: Number(document.getElementById('val_airpods').value) || 0
+      };
+      try {
+        const res = await api('submitData', payload);
+        Swal.fire({ title: 'Berhasil!', text: res.message, icon: 'success', confirmButtonColor: '#000' });
+        document.querySelectorAll('.uang-input').forEach(i => i.value = '');
+        document.getElementById('val_airpods').value = '';
+        hitungTotal();
+      } catch (err) { Swal.fire('Error', err.message, 'error'); }
+      finally { btn.innerHTML = ori; btn.disabled = false; }
+    }
+
+    async function loadHistory() {
+      const limit = document.getElementById('limit_history').value;
+      const c = document.getElementById('history_container');
+      c.innerHTML = '<p class="text-center text-gray-400 py-10"><i class="fas fa-spinner fa-spin text-2xl"></i></p>';
+      try {
+        const res = await api('getHistory', { limit });
+        let html = '';
+        res.forEach(item => {
+          html += `<div class="bg-gray-50 rounded-xl border border-gray-200 p-4"><div class="flex justify-between items-end border-b border-gray-200 pb-2 mb-2"><div><p class="text-sm font-extrabold text-gray-800">${item.staff}</p><p class="text-[10px] text-gray-500 font-semibold">${item.tanggal} • ${item.waktu}</p></div><span class="text-[9px] font-black bg-gray-200 text-gray-600 px-2 py-1 rounded">BARIS ${item.row}</span></div><div class="grid grid-cols-2 gap-x-4 gap-y-1 text-[11px] font-bold"><div class="flex justify-between py-1 cursor-pointer hover:bg-gray-200 rounded px-1" onclick="promptEdit(${item.row},'device','Device',${item.device})"><span class="text-gray-500">Device</span><span class="text-blue-600">${formatRp(item.device)} <i class="fas fa-pen text-[9px]"></i></span></div><div class="flex justify-between py-1 cursor-pointer hover:bg-gray-200 rounded px-1" onclick="promptEdit(${item.row},'acc','Accessories',${item.acc})"><span class="text-gray-500">Acc</span><span class="text-blue-600">${formatRp(item.acc)} <i class="fas fa-pen text-[9px]"></i></span></div><div class="flex justify-between py-1 cursor-pointer hover:bg-gray-200 rounded px-1" onclick="promptEdit(${item.row},'qoala','Qoala',${item.qoala})"><span class="text-gray-500">Qoala</span><span class="text-blue-600">${formatRp(item.qoala)} <i class="fas fa-pen text-[9px]"></i></span></div><div class="flex justify-between py-1 cursor-pointer hover:bg-gray-200 rounded px-1" onclick="promptEdit(${item.row},'tsel','Telkomsel',${item.tsel})"><span class="text-gray-500">Tsel</span><span class="text-blue-600">${formatRp(item.tsel)} <i class="fas fa-pen text-[9px]"></i></span></div><div class="flex justify-between py-1 cursor-pointer hover:bg-gray-200 rounded px-1" onclick="promptEdit(${item.row},'isat','Indosat',${item.isat})"><span class="text-gray-500">Isat</span><span class="text-blue-600">${formatRp(item.isat)} <i class="fas fa-pen text-[9px]"></i></span></div><div class="flex justify-between py-1 cursor-pointer hover:bg-gray-200 rounded px-1" onclick="promptEdit(${item.row},'xl','XL',${item.xl})"><span class="text-gray-500">XL</span><span class="text-blue-600">${formatRp(item.xl)} <i class="fas fa-pen text-[9px]"></i></span></div><div class="col-span-2 flex justify-between bg-orange-100 py-1 mt-1 cursor-pointer hover:bg-orange-200 rounded px-2" onclick="promptEdit(${item.row},'airpods','Airpods (Qty)',${item.airpods})"><span class="text-orange-600">Airpods (Qty)</span><span class="text-orange-600">${item.airpods} <i class="fas fa-pen text-[9px]"></i></span></div></div></div>`;
+        });
+        if (!html) html = '<p class="text-center text-gray-500 text-sm py-4">Belum ada histori.</p>';
+        c.innerHTML = html;
+      } catch (err) { c.innerHTML = '<p class="text-center text-red-500 text-sm py-4">' + err.message + '</p>'; }
+    }
+
+    function promptEdit(row, col, label, oldVal) {
+      Swal.fire({ title: `Koreksi ${label}`, text: `Ketik angka baru. Angka lama: ${oldVal}`, input: 'number', inputValue: oldVal, showCancelButton: true, confirmButtonText: 'Simpan', confirmButtonColor: '#000', cancelButtonText: 'Batal' })
+        .then(async (r) => {
+          if (r.isConfirmed) {
+            Swal.fire({ title: 'Memproses...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+            try {
+              const res = await api('updateTransaction', { row, col, value: Number(r.value) });
+              Swal.fire({ title: 'Sukses', text: res.message, icon: 'success', confirmButtonColor: '#000' });
+              loadHistory();
+            } catch (err) { Swal.fire('Error', err.message, 'error'); }
+          }
+        });
+    }
+
+    async function loadRank() {
+      const c = document.getElementById('rank_container');
+      c.innerHTML = '<p class="text-center text-gray-400 py-10"><i class="fas fa-spinner fa-spin text-2xl"></i></p>';
+      try {
+        const res = await api('getLeaderboard');
+        let html = '';
+        res.forEach((item, i) => {
+          let badge = `<span class="font-black text-gray-400 text-lg w-6 text-center">${i + 1}</span>`;
+          if (i === 0) badge = `<i class="fas fa-medal text-yellow-500 text-2xl w-6 text-center"></i>`;
+          if (i === 1) badge = `<i class="fas fa-medal text-gray-400 text-2xl w-6 text-center"></i>`;
+          if (i === 2) badge = `<i class="fas fa-medal text-amber-600 text-2xl w-6 text-center"></i>`;
+          html += `<div class="bg-gray-50 rounded-xl p-3 mb-2 flex items-center gap-3 border border-gray-100">${badge}<div class="flex-1 border-l-2 border-gray-200 pl-3"><p class="font-extrabold text-gray-800">${item.name}</p><p class="text-[10px] text-orange-600 font-bold mt-0.5"><i class="fas fa-headphones"></i> ${item.airpods} Airpods</p></div><div class="text-right"><p class="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Penjualan</p><p class="font-black text-blue-600 text-sm">Rp ${formatRp(item.total)}</p></div></div>`;
+        });
+        if (!html) html = '<p class="text-center text-gray-500 py-4 text-sm">Belum ada data.</p>';
+        c.innerHTML = html;
+      } catch (err) { c.innerHTML = '<p class="text-center text-red-500 py-4 text-sm">' + err.message + '</p>'; }
+    }
+
+    async function loadChart() {
+      try {
+        const res = await api('getMonthlyChartData');
+        const ctx = document.getElementById('monthlyChart').getContext('2d');
+        if (myChart) myChart.destroy();
+        myChart = new Chart(ctx, {
+          type: 'bar',
+          data: { labels: res.labels, datasets: [{ label: 'Total Penjualan (Rp)', data: res.data, backgroundColor: '#1e293b', borderRadius: 6 }] },
+          options: {
+            responsive: true,
+            plugins: { legend: { display: false } },
+            scales: {
+              y: { beginAtZero: true, ticks: { callback: v => v >= 1000000 ? (v/1000000) + ' Jt' : v >= 1000 ? (v/1000) + ' Rb' : v, font: { size: 10 } } },
+              x: { grid: { display: false }, ticks: { font: { size: 10 } } }
+            }
+          }
+        });
+      } catch (err) { Swal.fire('Error', err.message, 'error'); }
+    }
+  </script>
+</body>
+</html>
