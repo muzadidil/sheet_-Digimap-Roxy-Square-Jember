@@ -1,363 +1,1314 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Digimap Roxy Square Jember</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap');
-    body { font-family: 'Plus Jakarta Sans', sans-serif; background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%); min-height: 100vh; color: #1e293b; }
-    .glass-card { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border-radius: 1.5rem; box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.1); }
-    .btn-black { background: #000; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
-    .btn-black:hover:not(:disabled) { transform: translateY(-3px); box-shadow: 0 15px 30px rgba(0,0,0,0.3); }
-    .animate-in { animation: fadeIn 0.4s ease-out; }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-    .pin-box { width: 60px; height: 70px; text-align: center; font-size: 28px; font-weight: 900; border: 2px solid #e2e8f0; border-radius: 12px; background: #f8fafc; -moz-appearance: textfield; transition: all 0.2s; }
-    .pin-box::-webkit-outer-spin-button, .pin-box::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
-    .pin-box:focus { outline: none; border-color: #000; background: #fff; transform: scale(1.05); }
-    input[type="number"]::-webkit-inner-spin-button, input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
-  </style>
+<meta charset="UTF-8">
+<base target="_top">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Digimap Roxy Square Jember</title>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+
+:root {
+  --ios-bg: #000;
+  --ios-card: rgba(28, 28, 30, 0.85);
+  --ios-card-2: rgba(44, 44, 46, 0.7);
+  --ios-border: rgba(84, 84, 88, 0.35);
+  --ios-text: #fff;
+  --ios-text-2: rgba(235, 235, 245, 0.6);
+  --ios-text-3: rgba(235, 235, 245, 0.3);
+  --ios-blue: #0a84ff;
+  --ios-green: #30d158;
+  --ios-orange: #ff9f0a;
+  --ios-red: #ff453a;
+  --ios-yellow: #ffd60a;
+  --accent: var(--ios-blue);
+  --accent-rgb: 10, 132, 255;
+  --bg-radial-1: rgba(10, 132, 255, 0.15);
+  --bg-radial-2: rgba(255, 159, 10, 0.1);
+  --bg-base: #000;
+  --carbon: linear-gradient(135deg, #1a1a1a 0%, #2c2c2e 50%, #1a1a1a 100%);
+}
+html[data-theme="light"] {
+  --ios-bg: #f2f2f7;
+  --ios-card: rgba(255, 255, 255, 0.85);
+  --ios-card-2: rgba(242, 242, 247, 0.85);
+  --ios-border: rgba(60, 60, 67, 0.18);
+  --ios-text: #000;
+  --ios-text-2: rgba(60, 60, 67, 0.7);
+  --ios-text-3: rgba(60, 60, 67, 0.45);
+  --bg-base: #f2f2f7;
+  --bg-radial-1: rgba(var(--accent-rgb), 0.18);
+  --bg-radial-2: rgba(255, 159, 10, 0.12);
+  --carbon: linear-gradient(135deg, #ffffff 0%, #f2f2f7 50%, #ffffff 100%);
+}
+html[data-theme="light"] body { background: var(--bg-base); }
+html[data-theme="light"] .tab-btn.active {
+  background: linear-gradient(135deg, var(--accent) 0%, rgba(var(--accent-rgb), 0.8) 100%);
+  color: #fff;
+}
+html[data-theme="light"] .total-display {
+  background: linear-gradient(135deg, var(--accent) 0%, rgba(var(--accent-rgb), 0.85) 100%);
+}
+html[data-theme="light"] .total-display .label-total { color: rgba(255,255,255,0.8); }
+html[data-theme="light"] .total-display .total-value {
+  background: linear-gradient(180deg, #fff 0%, #e5e5ea 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+}
+html[data-theme="light"] .login-header h1 {
+  background: linear-gradient(180deg, #1c1c1e 0%, #48484a 100%);
+  -webkit-background-clip: text;
+}
+html[data-theme="light"] .ios-select option,
+html[data-theme="light"] .limit-select option { background: #fff; color: #000; }
+html[data-theme="light"] .apple-logo { background: linear-gradient(135deg, #fff 0%, #e5e5ea 100%); }
+html[data-theme="light"] .apple-logo svg path { fill: #1c1c1e !important; }
+
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body {
+  margin: 0; padding: 0;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
+  background: #000; color: var(--ios-text);
+  min-height: 100vh; min-height: 100dvh;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+body::before {
+  content: ''; position: fixed; inset: 0;
+  background: var(--bg-custom,
+    radial-gradient(circle at 20% 0%, var(--bg-radial-1) 0%, transparent 50%),
+    radial-gradient(circle at 80% 100%, var(--bg-radial-2) 0%, transparent 50%)
+  ) var(--bg-base);
+  background-attachment: fixed; z-index: -1;
+  transition: background 0.4s ease;
+}
+.container {
+  width: 100%; max-width: 420px; margin: 0 auto;
+  padding: env(safe-area-inset-top, 20px) 16px env(safe-area-inset-bottom, 20px);
+  min-height: 100vh; min-height: 100dvh;
+  display: flex; flex-direction: column;
+}
+
+.apple-logo {
+  width: 60px; height: 60px;
+  background: var(--carbon); border-radius: 18px;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.5),
+    inset 0 1px 0 rgba(255,255,255,0.1),
+    inset 0 -1px 0 rgba(0,0,0,0.3);
+  position: relative; overflow: hidden;
+}
+.apple-logo svg { width: 32px; height: 32px; fill: #f5f5f7; filter: drop-shadow(0 1px 2px rgba(0,0,0,0.5)); }
+
+.glass {
+  background: var(--ios-card);
+  backdrop-filter: blur(40px) saturate(180%);
+  -webkit-backdrop-filter: blur(40px) saturate(180%);
+  border: 1px solid var(--ios-border);
+  border-radius: 24px;
+}
+
+@keyframes slideUpFade { from { opacity: 0; transform: translateY(20px) scale(0.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
+@keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
+@keyframes pulseGlow { 0%,100% { box-shadow: 0 0 20px rgba(var(--accent-rgb), 0.3); } 50% { box-shadow: 0 0 30px rgba(var(--accent-rgb), 0.6); } }
+
+.login-wrapper { display: flex; align-items: center; justify-content: center; min-height: 100dvh; padding: 20px 0; }
+.login-card { width: 100%; padding: 32px 24px; animation: slideUpFade 0.6s cubic-bezier(0.16, 1, 0.3, 1); }
+.login-header { text-align: center; margin-bottom: 32px; }
+.login-header .apple-logo { margin: 0 auto 16px; }
+.login-header h1 {
+  margin: 0 0 4px; font-size: 28px; font-weight: 800; letter-spacing: -0.5px;
+  background: linear-gradient(180deg, #fff 0%, #c7c7cc 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.login-header p { margin: 0; font-size: 13px; font-weight: 500; color: var(--ios-text-2); letter-spacing: 0.3px; }
+
+.label { display: block; font-size: 11px; font-weight: 700; color: var(--ios-text-2); text-transform: uppercase; letter-spacing: 1.2px; margin-bottom: 8px; }
+.ios-select-wrap { position: relative; }
+.ios-select {
+  width: 100%; padding: 14px 40px 14px 16px;
+  background: var(--ios-card-2); border: 1px solid var(--ios-border);
+  border-radius: 14px; color: var(--ios-text);
+  font-family: inherit; font-size: 15px; font-weight: 600;
+  appearance: none; outline: none;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.ios-select:focus { border-color: var(--accent); background: rgba(var(--accent-rgb), 0.1); }
+.ios-select option { background: #1c1c1e; color: #fff; }
+.ios-select-arrow { position: absolute; right: 16px; top: 50%; transform: translateY(-50%); color: var(--ios-text-3); pointer-events: none; font-size: 12px; }
+
+.pin-row { display: flex; justify-content: center; gap: 12px; margin-top: 12px; }
+.pin-box {
+  width: 60px; height: 70px; text-align: center;
+  font-size: 28px; font-weight: 700; color: var(--ios-text);
+  background: var(--ios-card-2); border: 1.5px solid var(--ios-border);
+  border-radius: 16px; outline: none; font-family: inherit;
+  -moz-appearance: textfield;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.pin-box::-webkit-outer-spin-button, .pin-box::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.pin-box:focus { border-color: var(--accent); background: rgba(var(--accent-rgb), 0.15); transform: scale(1.08); animation: pulseGlow 1.5s infinite; }
+
+.btn-primary {
+  width: 100%; padding: 16px;
+  background: var(--carbon); border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 16px; color: #fff; font-family: inherit;
+  font-size: 15px; font-weight: 700; letter-spacing: 0.5px;
+  cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px;
+  transition: transform 0.15s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+  position: relative; overflow: hidden;
+}
+.btn-primary:active:not(:disabled) { transform: scale(0.97); }
+.btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.app-header { display: flex; align-items: center; justify-content: space-between; padding: 16px 4px 20px; }
+.app-header-left { display: flex; align-items: center; gap: 12px; }
+.app-header-info p:first-child { margin: 0; font-size: 10px; font-weight: 700; color: var(--ios-text-3); text-transform: uppercase; letter-spacing: 1.5px; }
+.app-header-info p:last-child { margin: 2px 0 0; font-size: 17px; font-weight: 800; letter-spacing: -0.3px; color: var(--ios-text); }
+.header-actions { display: flex; align-items: center; gap: 8px; }
+.icon-btn {
+  background: var(--ios-card-2); color: var(--ios-text);
+  border: 1px solid var(--ios-border); border-radius: 50%;
+  width: 40px; height: 40px; cursor: pointer; transition: all 0.2s;
+  font-size: 14px; display: flex; align-items: center; justify-content: center;
+}
+.icon-btn:active { transform: scale(0.92); }
+.icon-btn.danger { background: rgba(255,69,58,0.15); color: var(--ios-red); border-color: transparent; }
+
+.tab-bar {
+  display: flex; gap: 4px; padding: 4px;
+  background: var(--ios-card-2); backdrop-filter: blur(20px);
+  border: 1px solid var(--ios-border); border-radius: 16px;
+  margin-bottom: 20px;
+}
+.tab-btn {
+  flex: 1; padding: 10px 4px; background: transparent; border: none;
+  color: var(--ios-text-2); font-family: inherit;
+  font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px;
+  border-radius: 12px; cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+}
+.tab-btn i { font-size: 16px; }
+.tab-btn.active { background: var(--carbon); color: #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.3); }
+
+.field-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.field {
+  background: var(--ios-card-2); border: 1px solid var(--ios-border);
+  border-radius: 14px; padding: 12px 14px; transition: all 0.2s;
+}
+.field:focus-within { border-color: var(--accent); background: rgba(var(--accent-rgb), 0.08); }
+.field-label { font-size: 10px; font-weight: 700; color: var(--ios-text-3); text-transform: uppercase; letter-spacing: 1px; }
+.field-input-wrap { display: flex; align-items: center; gap: 6px; margin-top: 4px; }
+.field-input-wrap .prefix { color: var(--ios-text-3); font-size: 13px; font-weight: 700; }
+.field-input-wrap input {
+  flex: 1; width: 100%; background: transparent; border: none; outline: none;
+  color: var(--ios-text); font-family: inherit;
+  font-size: 16px; font-weight: 700; text-align: right; padding: 0;
+}
+.field-input-wrap input::placeholder { color: var(--ios-text-3); font-weight: 500; }
+.field.airpods {
+  grid-column: span 2;
+  background: linear-gradient(135deg, rgba(255,159,10,0.15) 0%, rgba(255,159,10,0.05) 100%);
+  border-color: rgba(255,159,10,0.3);
+}
+.field.airpods .field-label { color: var(--ios-orange); }
+.field.airpods .field-input-wrap input { text-align: left; }
+
+.total-display {
+  margin-top: 12px; padding: 18px 20px;
+  background: var(--carbon); border-radius: 20px;
+  border: 1px solid rgba(255,255,255,0.08);
+  display: flex; justify-content: space-between; align-items: center;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+  position: relative; overflow: hidden;
+}
+.total-display::before {
+  content: ''; position: absolute; top: 0; left: -100%;
+  width: 100%; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+  animation: shimmer 3s infinite;
+}
+.total-display .label-total { font-size: 10px; font-weight: 700; color: var(--ios-text-3); text-transform: uppercase; letter-spacing: 1.5px; }
+.total-display .total-value {
+  font-size: 22px; font-weight: 800; letter-spacing: -0.5px;
+  background: linear-gradient(180deg, #fff 0%, #c7c7cc 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+}
+
+.history-toolbar { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; }
+.history-toolbar .hint { flex: 1; font-size: 10px; font-weight: 600; color: var(--ios-text-3); text-transform: uppercase; letter-spacing: 1px; }
+.btn-export {
+  background: linear-gradient(135deg, #30d158 0%, #248a3d 100%);
+  color: #fff; border: none; padding: 8px 14px; border-radius: 10px;
+  font-family: inherit; font-size: 11px; font-weight: 700; cursor: pointer;
+}
+.btn-export:active { transform: scale(0.95); }
+.limit-select {
+  background: var(--ios-card-2); color: var(--ios-text);
+  border: 1px solid var(--ios-border); border-radius: 10px;
+  padding: 6px 10px; font-family: inherit;
+  font-size: 11px; font-weight: 600; outline: none;
+}
+.limit-select option { background: #1c1c1e; }
+
+.history-list { display: flex; flex-direction: column; gap: 10px; max-height: 60vh; overflow-y: auto; padding-right: 4px; }
+.history-card { padding: 14px; animation: slideUpFade 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+.history-card-head {
+  display: flex; justify-content: space-between; align-items: end;
+  border-bottom: 1px solid var(--ios-border); padding-bottom: 8px; margin-bottom: 10px;
+}
+.history-card-head .name { font-size: 14px; font-weight: 800; margin: 0; }
+.history-card-head .meta { font-size: 11px; font-weight: 600; color: var(--ios-text-3); margin: 2px 0 0; }
+.hist-head-acts { display: flex; align-items: center; gap: 6px; }
+.hist-del {
+  background: rgba(255,69,58,0.15); color: var(--ios-red);
+  border: none; width: 26px; height: 26px; border-radius: 8px;
+  cursor: pointer; font-size: 11px;
+  display: flex; align-items: center; justify-content: center;
+}
+.hist-del:active { transform: scale(0.88); background: rgba(255,69,58,0.3); }
+.history-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 12px; font-size: 12px; font-weight: 600; }
+.history-item { display: flex; justify-content: space-between; padding: 6px 8px; border-radius: 8px; cursor: pointer; }
+.history-item:active { background: rgba(255,255,255,0.05); }
+.history-item .key { color: var(--ios-text-3); }
+.history-item .value { color: var(--accent); display: flex; align-items: center; gap: 4px; }
+.history-item.airpods { grid-column: span 2; background: rgba(255,159,10,0.1); margin-top: 4px; }
+.history-item.airpods .key, .history-item.airpods .value { color: var(--ios-orange); }
+
+.rank-list { display: flex; flex-direction: column; gap: 10px; max-height: 60vh; overflow-y: auto; }
+.rank-card { padding: 14px; display: flex; align-items: center; gap: 12px; animation: slideUpFade 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+.rank-badge { width: 36px; text-align: center; font-size: 18px; font-weight: 800; }
+.rank-badge .fa-medal { font-size: 22px; }
+.rank-info { flex: 1; border-left: 2px solid var(--ios-border); padding-left: 12px; }
+.rank-info .name { font-size: 14px; font-weight: 800; margin: 0; }
+.rank-info .sub { font-size: 11px; font-weight: 600; color: var(--ios-orange); margin: 2px 0 0; }
+.rank-total { text-align: right; }
+.rank-total .l { font-size: 9px; font-weight: 700; color: var(--ios-text-3); text-transform: uppercase; letter-spacing: 1px; }
+.rank-total .v { font-size: 14px; font-weight: 800; color: var(--accent); }
+
+.chart-card { padding: 16px; }
+.chart-card h2 { margin: 0 0 16px; font-size: 13px; font-weight: 700; text-align: center; color: var(--ios-text-2); }
+
+*::-webkit-scrollbar { width: 4px; }
+*::-webkit-scrollbar-thumb { background: var(--ios-border); border-radius: 4px; }
+
+.hidden { display: none !important; }
+.empty-state { text-align: center; padding: 40px 20px; color: var(--ios-text-3); font-size: 13px; }
+.loading { text-align: center; padding: 40px 20px; color: var(--ios-text-3); font-size: 22px; }
+
+.avatar { width: 44px; height: 44px; border-radius: 50%; object-fit: cover; border: 2px solid var(--ios-border); background: var(--ios-card-2); }
+.avatar-fallback {
+  width: 44px; height: 44px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent) 0%, rgba(var(--accent-rgb), 0.6) 100%);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px; font-weight: 800; color: #fff;
+}
+
+.admin-section { padding: 16px; margin-bottom: 12px; }
+.admin-section h3 {
+  margin: 0 0 12px; font-size: 13px; font-weight: 800;
+  text-transform: uppercase; letter-spacing: 1.2px;
+  color: var(--ios-text-2); display: flex; align-items: center; gap: 8px;
+}
+.admin-section h3 i { color: var(--accent); }
+.member-list { display: flex; flex-direction: column; gap: 8px; max-height: 50vh; overflow-y: auto; }
+.member-row {
+  display: flex; align-items: center; gap: 12px; padding: 10px;
+  background: var(--ios-card-2); border: 1px solid var(--ios-border);
+  border-radius: 14px;
+}
+.member-row .info { flex: 1; }
+.member-row .info .nm { font-size: 14px; font-weight: 800; color: var(--ios-text); margin: 0; }
+.member-row .info .rl { font-size: 11px; font-weight: 600; color: var(--ios-text-3); margin: 2px 0 0; }
+.member-row .acts { display: flex; gap: 6px; }
+.mini-btn {
+  width: 32px; height: 32px; border: none; border-radius: 8px;
+  background: rgba(var(--accent-rgb), 0.18); color: var(--accent);
+  cursor: pointer; font-size: 12px;
+  display: flex; align-items: center; justify-content: center;
+}
+.mini-btn.danger { background: rgba(255,69,58,0.18); color: var(--ios-red); }
+.mini-btn:active { transform: scale(0.9); }
+
+.theme-grid { display: grid; grid-template-columns: repeat(8, 1fr); gap: 6px; margin-top: 8px; }
+.theme-swatch {
+  aspect-ratio: 1; border-radius: 10px; cursor: pointer;
+  border: 2px solid transparent; position: relative;
+  transition: transform 0.15s;
+}
+.theme-swatch:active { transform: scale(0.92); }
+.theme-swatch.active { border-color: var(--ios-text); box-shadow: 0 0 0 2px rgba(var(--accent-rgb), 0.4); }
+.theme-swatch.active::after {
+  content: '\f00c'; font-family: 'Font Awesome 6 Free'; font-weight: 900;
+  position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+  color: #fff; font-size: 13px; text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+}
+
+.mode-toggle {
+  display: flex; gap: 4px; padding: 4px;
+  background: var(--ios-card-2); border: 1px solid var(--ios-border);
+  border-radius: 12px; margin-top: 8px;
+}
+.mode-btn {
+  flex: 1; padding: 8px; background: transparent; border: none;
+  color: var(--ios-text-2); font-family: inherit;
+  font-size: 12px; font-weight: 700; border-radius: 8px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+}
+.mode-btn.active { background: var(--carbon); color: var(--ios-text); }
+html[data-theme="light"] .mode-btn.active { background: #fff; color: #1c1c1e; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+
+.report-filter { display: flex; gap: 8px; margin-bottom: 12px; }
+.report-filter select, .report-filter input {
+  flex: 1; background: var(--ios-card-2);
+  border: 1px solid var(--ios-border); border-radius: 10px;
+  padding: 8px 10px; color: var(--ios-text);
+  font-family: inherit; font-size: 12px; font-weight: 600; outline: none;
+}
+
+.color-section { margin-top: 14px; }
+.color-section-title {
+  font-size: 10px; font-weight: 800;
+  text-transform: uppercase; letter-spacing: 1.2px;
+  color: var(--ios-text-3); margin-bottom: 8px;
+  display: flex; align-items: center; gap: 6px;
+}
+.color-picker-row {
+  display: flex; align-items: center; gap: 10px; padding: 12px;
+  background: var(--ios-card-2); border: 1px solid var(--ios-border);
+  border-radius: 14px;
+}
+.color-picker-row input[type="color"] {
+  width: 44px; height: 44px;
+  border: 2px solid var(--ios-border); border-radius: 12px;
+  cursor: pointer; background: transparent; padding: 2px;
+}
+.color-picker-row input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
+.color-picker-row input[type="color"]::-webkit-color-swatch { border: none; border-radius: 8px; }
+.color-picker-row .label-info { flex: 1; }
+.color-picker-row .label-info .t { font-size: 13px; font-weight: 700; color: var(--ios-text); margin: 0; }
+.color-picker-row .label-info .s { font-size: 11px; font-weight: 600; color: var(--ios-text-3); margin: 2px 0 0; }
+.color-picker-row .reset-btn {
+  background: transparent; border: 1px solid var(--ios-border);
+  color: var(--ios-text-2); border-radius: 10px;
+  padding: 8px 12px; font-family: inherit;
+  font-size: 11px; font-weight: 700; cursor: pointer;
+}
+
+.bg-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; margin-top: 8px; }
+.bg-swatch {
+  aspect-ratio: 1.4; border-radius: 12px; cursor: pointer;
+  border: 2px solid transparent; position: relative; overflow: hidden;
+  transition: transform 0.15s;
+}
+.bg-swatch:active { transform: scale(0.92); }
+.bg-swatch.active { border-color: var(--accent); }
+.bg-swatch.active::after {
+  content: '\f00c'; font-family: 'Font Awesome 6 Free'; font-weight: 900;
+  position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+  color: #fff; font-size: 14px; text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+}
+
+.swal2-container { backdrop-filter: blur(8px); background: rgba(0,0,0,0.35) !important; }
+html[data-theme="light"] .swal2-container { background: rgba(255,255,255,0.3) !important; }
+.swal2-popup {
+  border-radius: 24px !important; padding: 28px 24px !important;
+  background: rgba(28,28,30,0.88) !important;
+  backdrop-filter: blur(40px) saturate(180%) !important;
+  border: 1px solid var(--ios-border) !important;
+  color: #fff !important; font-family: 'Inter', sans-serif !important;
+}
+html[data-theme="light"] .swal2-popup { background: rgba(255,255,255,0.92) !important; color: #1c1c1e !important; }
+.swal2-title { font-size: 20px !important; font-weight: 800 !important; margin: 8px 0 6px !important; }
+html[data-theme="light"] .swal2-title { color: #1c1c1e !important; }
+.swal2-html-container { font-size: 14px !important; color: var(--ios-text-2) !important; margin: 0 !important; }
+html[data-theme="light"] .swal2-html-container { color: #1c1c1e !important; }
+.swal2-actions button {
+  border-radius: 14px !important; padding: 12px 22px !important;
+  font-weight: 700 !important; font-size: 14px !important;
+  font-family: 'Inter', sans-serif !important;
+}
+.swal2-confirm { background: linear-gradient(135deg, var(--accent) 0%, rgba(var(--accent-rgb), 0.85) 100%) !important; }
+.swal2-input {
+  background: var(--ios-card-2) !important; border: 1px solid var(--ios-border) !important;
+  border-radius: 12px !important; color: var(--ios-text) !important;
+  font-family: 'Inter', sans-serif !important;
+  font-weight: 600 !important; font-size: 14px !important;
+}
+</style>
 </head>
-<body class="flex items-center justify-center p-4">
+<body>
 
-  <div id="view_login" class="glass-card w-full max-w-md p-8 my-4 hidden">
-    <div class="text-center mb-6">
-      <div class="inline-block p-4 bg-black rounded-2xl mb-3"><i class="fas fa-store text-white text-3xl"></i></div>
-      <h2 class="text-2xl font-extrabold text-gray-800 tracking-tight">Digimap</h2>
-      <p class="text-sm font-bold text-gray-500">Roxy Square Jember</p>
-    </div>
-    <div class="space-y-5">
-      <div>
-        <label class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Pilih Nama</label>
-        <div class="relative">
-          <select id="login_nama" class="w-full p-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-black bg-gray-50 font-bold text-gray-700 cursor-pointer appearance-none transition-all">
-            <option value="">-- Memuat... --</option>
-          </select>
-          <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-400"><i class="fas fa-chevron-down"></i></div>
-        </div>
+<!-- LOGIN VIEW -->
+<div id="view_login" class="container login-wrapper">
+  <div class="login-card glass">
+    <div class="login-header">
+      <div class="apple-logo">
+        <svg viewBox="0 0 384 512"><path d="M318.7 268.7c-.2-36.7 16.4-64.4 50-84.8-18.8-26.9-47.2-41.7-84.7-44.6-35.5-2.8-74.3 20.7-88.5 20.7-15 0-49.4-19.7-76.4-19.7C63.3 141.2 4 184.8 4 273.5q0 39.3 14.4 81.2c12.8 36.7 59 126.7 107.2 125.2 25.2-.6 43-17.9 75.8-17.9 31.8 0 48.3 17.9 76.4 17.9 48.6-.7 90.4-82.5 102.6-119.3-65.2-30.7-61.7-90-61.7-91.9zm-56.6-164.2c27.3-32.4 24.8-61.9 24-72.5-24.1 1.4-52 16.4-67.9 34.9-17.5 19.8-27.8 44.3-25.6 71.9 26.1 2 49.9-11.4 69.5-34.3z"/></svg>
       </div>
-      <div>
-        <label class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-3 text-center">Masukkan PIN</label>
-        <div class="flex justify-center gap-3" id="pin_container">
-          <input type="number" inputmode="numeric" maxlength="1" class="pin-box" data-idx="0">
-          <input type="number" inputmode="numeric" maxlength="1" class="pin-box" data-idx="1">
-          <input type="number" inputmode="numeric" maxlength="1" class="pin-box" data-idx="2">
-          <input type="number" inputmode="numeric" maxlength="1" class="pin-box" data-idx="3">
-        </div>
-      </div>
-      <button id="btn_login" onclick="doLogin()" class="w-full btn-black text-white font-black py-4 rounded-xl shadow-xl disabled:opacity-50 uppercase tracking-widest text-sm flex items-center justify-center gap-3">
-        <span>Masuk</span><i class="fas fa-arrow-right"></i>
-      </button>
-    </div>
-  </div>
-
-  <div id="view_app" class="glass-card w-full max-w-lg p-6 my-4 hidden">
-    <div class="flex justify-between items-center mb-4 border-b border-gray-100 pb-4">
-      <div>
-        <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Selamat datang,</p>
-        <p id="user_name" class="text-lg font-extrabold text-gray-800">-</p>
-      </div>
-      <button onclick="doLogout()" class="text-xs font-bold text-red-500 hover:text-red-700 transition-all px-3 py-2 rounded-lg hover:bg-red-50">
-        <i class="fas fa-sign-out-alt"></i> Logout
-      </button>
+      <h1>Digimap Roxy</h1>
+      <p>Square Jember &bull; Sales Tracker</p>
     </div>
 
-    <div class="flex gap-1 mb-6 p-1 bg-gray-100 rounded-2xl border border-gray-200 overflow-x-auto">
-      <button id="nav_input" onclick="switchTab('input')" class="flex-1 py-3 px-2 text-[9px] font-black uppercase tracking-widest rounded-xl bg-slate-800 text-white shadow-md transition-all whitespace-nowrap"><i class="fas fa-edit"></i> Input</button>
-      <button id="nav_history" onclick="switchTab('history')" class="flex-1 py-3 px-2 text-[9px] font-black uppercase tracking-widest rounded-xl text-gray-500 hover:text-slate-800 transition-all whitespace-nowrap"><i class="fas fa-history"></i> Histori</button>
-      <button id="nav_rank" onclick="switchTab('rank')" class="flex-1 py-3 px-2 text-[9px] font-black uppercase tracking-widest rounded-xl text-gray-500 hover:text-slate-800 transition-all whitespace-nowrap"><i class="fas fa-trophy"></i> Rank</button>
-      <button id="nav_chart" onclick="switchTab('chart')" class="flex-1 py-3 px-2 text-[9px] font-black uppercase tracking-widest rounded-xl text-gray-500 hover:text-slate-800 transition-all whitespace-nowrap"><i class="fas fa-chart-line"></i> Grafik</button>
-    </div>
-
-    <div id="view_input" class="animate-in">
-      <div class="space-y-4">
-        <div class="grid grid-cols-2 gap-4">
-          <div>
-            <label class="block text-[10px] font-bold text-gray-500 uppercase mb-1 ml-1">Device</label>
-            <div class="relative"><span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 font-bold text-sm">Rp</span><input type="text" id="val_device" class="uang-input w-full pl-9 pr-3 py-3 bg-gray-50 rounded-xl border-2 border-gray-200 text-sm font-black text-gray-800 focus:outline-none focus:border-blue-500 transition-all text-right" placeholder="0"></div>
-          </div>
-          <div>
-            <label class="block text-[10px] font-bold text-gray-500 uppercase mb-1 ml-1">Accessories</label>
-            <div class="relative"><span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 font-bold text-sm">Rp</span><input type="text" id="val_accessories" class="uang-input w-full pl-9 pr-3 py-3 bg-gray-50 rounded-xl border-2 border-gray-200 text-sm font-black text-gray-800 focus:outline-none focus:border-blue-500 transition-all text-right" placeholder="0"></div>
-          </div>
-          <div>
-            <label class="block text-[10px] font-bold text-gray-500 uppercase mb-1 ml-1">Qoala</label>
-            <div class="relative"><span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 font-bold text-sm">Rp</span><input type="text" id="val_qoala" class="uang-input w-full pl-9 pr-3 py-3 bg-gray-50 rounded-xl border-2 border-gray-200 text-sm font-black text-gray-800 focus:outline-none focus:border-blue-500 transition-all text-right" placeholder="0"></div>
-          </div>
-          <div>
-            <label class="block text-[10px] font-bold text-gray-500 uppercase mb-1 ml-1">Telkomsel</label>
-            <div class="relative"><span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 font-bold text-sm">Rp</span><input type="text" id="val_telkomsel" class="uang-input w-full pl-9 pr-3 py-3 bg-gray-50 rounded-xl border-2 border-gray-200 text-sm font-black text-gray-800 focus:outline-none focus:border-blue-500 transition-all text-right" placeholder="0"></div>
-          </div>
-          <div>
-            <label class="block text-[10px] font-bold text-gray-500 uppercase mb-1 ml-1">Indosat</label>
-            <div class="relative"><span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 font-bold text-sm">Rp</span><input type="text" id="val_indosat" class="uang-input w-full pl-9 pr-3 py-3 bg-gray-50 rounded-xl border-2 border-gray-200 text-sm font-black text-gray-800 focus:outline-none focus:border-blue-500 transition-all text-right" placeholder="0"></div>
-          </div>
-          <div>
-            <label class="block text-[10px] font-bold text-gray-500 uppercase mb-1 ml-1">XL</label>
-            <div class="relative"><span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 font-bold text-sm">Rp</span><input type="text" id="val_xl" class="uang-input w-full pl-9 pr-3 py-3 bg-gray-50 rounded-xl border-2 border-gray-200 text-sm font-black text-gray-800 focus:outline-none focus:border-blue-500 transition-all text-right" placeholder="0"></div>
-          </div>
-        </div>
-
-        <div class="p-3 bg-orange-50 rounded-xl border border-orange-100">
-          <label class="block text-[10px] font-bold text-orange-600 uppercase mb-1 ml-1">Airpods (Qty)</label>
-          <div class="relative">
-            <input type="number" id="val_airpods" class="w-full pl-4 pr-10 py-3 bg-white rounded-xl border border-orange-200 text-sm font-black text-gray-800 focus:outline-none focus:border-orange-500 transition-all" placeholder="Jumlah unit">
-            <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-orange-400"><i class="fas fa-headphones"></i></div>
-          </div>
-        </div>
-
-        <div class="mt-2 p-5 bg-slate-800 rounded-2xl shadow-inner flex justify-between items-center">
-          <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Total Pemasukan</p>
-          <p id="total_display" class="text-2xl font-black text-white">Rp 0</p>
-        </div>
-
-        <button id="btn_submit" onclick="submitForm()" class="w-full btn-black text-white font-black py-4 rounded-xl shadow-xl disabled:opacity-50 uppercase tracking-widest text-sm flex items-center justify-center gap-3">
-          <span>Simpan Data</span><i class="fas fa-save"></i>
-        </button>
-      </div>
-    </div>
-
-    <div id="view_history" class="hidden animate-in">
-      <div class="flex justify-between items-center mb-4 px-1">
-        <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Ketuk nilai untuk edit</p>
-        <select id="limit_history" onchange="loadHistory()" class="bg-gray-100 border border-gray-200 text-xs font-bold rounded-lg px-2 py-1 outline-none text-gray-700">
-          <option value="20">20 Data</option><option value="50">50 Data</option><option value="100">100 Data</option>
+    <div style="margin-bottom: 20px;">
+      <label class="label">Nama</label>
+      <div class="ios-select-wrap">
+        <select id="login_nama" class="ios-select">
+          <option value="">-- Pilih Nama --</option>
         </select>
-      </div>
-      <div id="history_container" class="space-y-3 max-h-[60vh] overflow-y-auto pr-1">
-        <p class="text-center text-gray-400 py-10"><i class="fas fa-spinner fa-spin text-2xl"></i></p>
+        <i class="fas fa-chevron-down ios-select-arrow"></i>
       </div>
     </div>
 
-    <div id="view_rank" class="hidden animate-in">
-      <div id="rank_container" class="space-y-3 max-h-[60vh] overflow-y-auto pr-1">
-        <p class="text-center text-gray-400 py-10"><i class="fas fa-spinner fa-spin text-2xl"></i></p>
+    <div>
+      <label class="label">PIN 4 Digit</label>
+      <div class="pin-row">
+        <input class="pin-box" type="tel" inputmode="numeric" maxlength="1">
+        <input class="pin-box" type="tel" inputmode="numeric" maxlength="1">
+        <input class="pin-box" type="tel" inputmode="numeric" maxlength="1">
+        <input class="pin-box" type="tel" inputmode="numeric" maxlength="1">
       </div>
     </div>
 
-    <div id="view_chart" class="hidden animate-in">
-      <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
-        <h2 class="text-sm font-bold text-gray-800 mb-4 text-center">Penjualan Bulanan (Rp)</h2>
-        <canvas id="monthlyChart"></canvas>
-      </div>
+    <div style="margin-top: 28px;">
+      <button class="btn-primary" id="btn_login"><i class="fas fa-unlock"></i> MASUK</button>
     </div>
   </div>
+</div>
 
-  <script>
-    const API_URL = 'GANTI_DENGAN_URL_WEB_APP_APPS_SCRIPT_ANDA';
-    const SESSION_KEY = 'digimap_session';
-    let myChart = null;
-    const formatRp = (n) => new Intl.NumberFormat('id-ID', { minimumFractionDigits: 0 }).format(n);
+<!-- APP VIEW -->
+<div id="view_app" class="container hidden">
+  <header class="app-header">
+    <div class="app-header-left">
+      <div id="user_avatar_wrap" class="avatar-fallback">?</div>
+      <div class="app-header-info">
+        <p>SELAMAT DATANG</p>
+        <p id="user_name">&mdash;</p>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button id="btn_theme" class="icon-btn" title="Mode terang/gelap"><i class="fas fa-moon"></i></button>
+      <button id="btn_logout" class="icon-btn danger" title="Logout"><i class="fas fa-sign-out-alt"></i></button>
+    </div>
+  </header>
 
-    async function api(action, payload = {}) {
-      try {
-        const fd = new FormData();
-        fd.append('action', action);
-        fd.append('payload', JSON.stringify(payload));
-        const res = await fetch(API_URL, { method: 'POST', body: fd, redirect: 'follow' });
-        if (!res.ok) throw new Error('HTTP ' + res.status);
-        return await res.json();
-      } catch (err) { throw new Error('Koneksi gagal: ' + err.message); }
+  <nav class="tab-bar">
+    <button class="tab-btn active" data-tab="input"><i class="fas fa-plus-circle"></i>Input</button>
+    <button class="tab-btn" data-tab="history"><i class="fas fa-history"></i>History</button>
+    <button class="tab-btn" data-tab="rank"><i class="fas fa-trophy"></i>Rank</button>
+    <button class="tab-btn" data-tab="chart"><i class="fas fa-chart-bar"></i>Chart</button>
+    <button class="tab-btn hidden" data-tab="admin" id="tab_admin"><i class="fas fa-user-shield"></i>Admin</button>
+  </nav>
+
+  <section id="view_input">
+    <div class="field-grid">
+      <div class="field"><div class="field-label">Device</div><div class="field-input-wrap"><span class="prefix">Rp</span><input class="uang-input" id="val_device" inputmode="numeric" placeholder="0"></div></div>
+      <div class="field"><div class="field-label">Accessories</div><div class="field-input-wrap"><span class="prefix">Rp</span><input class="uang-input" id="val_accessories" inputmode="numeric" placeholder="0"></div></div>
+      <div class="field"><div class="field-label">Qoala</div><div class="field-input-wrap"><span class="prefix">Rp</span><input class="uang-input" id="val_qoala" inputmode="numeric" placeholder="0"></div></div>
+      <div class="field"><div class="field-label">Telkomsel</div><div class="field-input-wrap"><span class="prefix">Rp</span><input class="uang-input" id="val_telkomsel" inputmode="numeric" placeholder="0"></div></div>
+      <div class="field"><div class="field-label">Indosat</div><div class="field-input-wrap"><span class="prefix">Rp</span><input class="uang-input" id="val_indosat" inputmode="numeric" placeholder="0"></div></div>
+      <div class="field"><div class="field-label">XL</div><div class="field-input-wrap"><span class="prefix">Rp</span><input class="uang-input" id="val_xl" inputmode="numeric" placeholder="0"></div></div>
+      <div class="field airpods"><div class="field-label"><i class="fas fa-headphones"></i> Airpods (Qty)</div><div class="field-input-wrap"><input id="val_airpods" type="number" min="0" placeholder="0"></div></div>
+    </div>
+
+    <div class="total-display">
+      <div><p class="label-total">Total</p></div>
+      <p class="total-value" id="total_display">Rp 0</p>
+    </div>
+
+    <div style="margin-top: 14px;">
+      <button class="btn-primary" id="btn_submit"><i class="fas fa-cloud-upload-alt"></i> SIMPAN DATA</button>
+    </div>
+  </section>
+
+  <section id="view_history" class="hidden">
+    <div class="history-toolbar">
+      <span class="hint">Tampilkan</span>
+      <select id="limit_history" class="limit-select">
+        <option value="10">10</option>
+        <option value="20" selected>20</option>
+        <option value="50">50</option>
+        <option value="100">100</option>
+      </select>
+      <button id="btn_export" class="btn-export hidden"><i class="fas fa-file-excel"></i> Excel</button>
+    </div>
+    <div id="history_container" class="history-list"></div>
+  </section>
+
+  <section id="view_rank" class="hidden">
+    <div id="rank_container" class="rank-list"></div>
+  </section>
+
+  <section id="view_chart" class="hidden">
+    <div class="chart-card glass">
+      <h2>Penjualan Bulanan</h2>
+      <canvas id="monthlyChart"></canvas>
+    </div>
+  </section>
+
+  <section id="view_admin" class="hidden">
+    <div class="admin-section glass">
+      <h3><i class="fas fa-palette"></i> Tampilan</h3>
+      <div class="mode-toggle">
+        <button class="mode-btn" data-mode="dark"><i class="fas fa-moon"></i> Gelap</button>
+        <button class="mode-btn" data-mode="light"><i class="fas fa-sun"></i> Terang</button>
+      </div>
+      <div class="color-section">
+        <div class="color-section-title"><i class="fas fa-droplet"></i> Warna Aksen</div>
+        <div id="theme_grid" class="theme-grid"></div>
+        <div class="color-picker-row" style="margin-top: 10px;">
+          <input type="color" id="custom_accent" value="#0a84ff">
+          <div class="label-info">
+            <p class="t">Warna Kustom</p>
+            <p class="s">Pilih warna bebas</p>
+          </div>
+          <button class="reset-btn" id="reset_accent">Reset</button>
+        </div>
+      </div>
+      <div class="color-section">
+        <div class="color-section-title"><i class="fas fa-image"></i> Background</div>
+        <div id="bg_grid" class="bg-grid"></div>
+        <div class="color-picker-row" style="margin-top: 10px;">
+          <input type="color" id="custom_bg" value="#000000">
+          <div class="label-info">
+            <p class="t">Solid Color</p>
+            <p class="s">Background warna polos</p>
+          </div>
+          <button class="reset-btn" id="reset_bg">Reset</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="admin-section glass">
+      <h3><i class="fas fa-users"></i> Anggota</h3>
+      <div id="member_list" class="member-list"></div>
+      <div style="margin-top: 12px;">
+        <button class="btn-primary" id="btn_add_member"><i class="fas fa-user-plus"></i> Tambah Anggota</button>
+      </div>
+    </div>
+
+    <div class="admin-section glass">
+      <h3><i class="fas fa-file-export"></i> Laporan</h3>
+      <div class="report-filter">
+        <select id="filter_member"><option value="">Semua Anggota</option></select>
+        <input id="filter_month" type="month">
+      </div>
+      <div style="display:flex; gap:8px;">
+        <button class="btn-primary" id="btn_export_xlsx"><i class="fas fa-file-excel"></i> Excel</button>
+        <button class="btn-primary" id="btn_open_sheet"><i class="fab fa-google"></i> Buka Sheet</button>
+      </div>
+    </div>
+  </section>
+</div>
+
+<script>
+// ===== KONFIG =====
+const SESSION_KEY = 'digimap_session';
+const THEME_KEY   = 'digimap_theme';
+const MODE_KEY    = 'digimap_mode';
+const BG_KEY      = 'digimap_bg';
+
+// ===== PROMISE WRAPPER untuk google.script.run =====
+function gs(fnName, arg) {
+  return new Promise((resolve, reject) => {
+    google.script.run
+      .withSuccessHandler(resolve)
+      .withFailureHandler(err => reject(new Error(err && err.message ? err.message : String(err))))
+      [fnName](arg);
+  });
+}
+
+// ===== STATE =====
+let myChart = null;
+let currentUser = null;
+let isSuperUser = false;
+let cachedMembers = [];
+
+const formatRp = n => new Intl.NumberFormat('id-ID').format(n);
+
+// ===== THEME PRESETS (32 warna) =====
+const THEMES = [
+  { id:'blue',name:'Biru iOS',color:'#0a84ff' },{ id:'ocean',name:'Ocean',color:'#0077be' },
+  { id:'navy',name:'Navy',color:'#1e3a8a' },{ id:'indigo',name:'Indigo',color:'#5e5ce6' },
+  { id:'purple',name:'Ungu',color:'#bf5af2' },{ id:'violet',name:'Violet',color:'#8b5cf6' },
+  { id:'magenta',name:'Magenta',color:'#d946ef' },{ id:'pink',name:'Pink',color:'#ff375f' },
+  { id:'rose',name:'Rose',color:'#f43f5e' },{ id:'red',name:'Merah',color:'#ff453a' },
+  { id:'crimson',name:'Crimson',color:'#dc2626' },{ id:'maroon',name:'Maroon',color:'#7f1d1d' },
+  { id:'orange',name:'Oranye',color:'#ff9f0a' },{ id:'coral',name:'Coral',color:'#fb7185' },
+  { id:'amber',name:'Amber',color:'#f59e0b' },{ id:'yellow',name:'Kuning',color:'#ffd60a' },
+  { id:'gold',name:'Gold',color:'#eab308' },{ id:'lime',name:'Lime',color:'#84cc16' },
+  { id:'green',name:'Hijau iOS',color:'#30d158' },{ id:'emerald',name:'Emerald',color:'#10b981' },
+  { id:'forest',name:'Forest',color:'#166534' },{ id:'teal',name:'Teal',color:'#14b8a6' },
+  { id:'mint',name:'Mint',color:'#63e6e2' },{ id:'cyan',name:'Cyan',color:'#06b6d4' },
+  { id:'sky',name:'Sky',color:'#5ac8fa' },{ id:'slate',name:'Slate',color:'#64748b' },
+  { id:'gray',name:'Gray',color:'#71717a' },{ id:'stone',name:'Stone',color:'#78716c' },
+  { id:'brown',name:'Brown',color:'#92400e' },{ id:'bronze',name:'Bronze',color:'#a16207' },
+  { id:'black',name:'Hitam',color:'#1c1c1e' },{ id:'silver',name:'Silver',color:'#a8a29e' }
+];
+
+const BACKGROUNDS = [
+  { id:'default-dark',name:'Default Gelap',type:'default',mode:'dark' },
+  { id:'default-light',name:'Default Terang',type:'default',mode:'light' },
+  { id:'midnight',name:'Midnight',css:'linear-gradient(135deg,#0f0c29 0%,#302b63 50%,#24243e 100%)' },
+  { id:'sunset',name:'Sunset',css:'linear-gradient(135deg,#ff6e7f 0%,#bfe9ff 100%)' },
+  { id:'ocean',name:'Ocean',css:'linear-gradient(135deg,#2e3192 0%,#1bffff 100%)' },
+  { id:'aurora',name:'Aurora',css:'linear-gradient(135deg,#00c6ff 0%,#0072ff 100%)' },
+  { id:'forest',name:'Forest',css:'linear-gradient(135deg,#134e5e 0%,#71b280 100%)' },
+  { id:'lavender',name:'Lavender',css:'linear-gradient(135deg,#a18cd1 0%,#fbc2eb 100%)' },
+  { id:'peach',name:'Peach',css:'linear-gradient(135deg,#ffecd2 0%,#fcb69f 100%)' },
+  { id:'mint',name:'Mint',css:'linear-gradient(135deg,#84fab0 0%,#8fd3f4 100%)' },
+  { id:'rose-gold',name:'Rose Gold',css:'linear-gradient(135deg,#ee9ca7 0%,#ffdde1 100%)' },
+  { id:'cosmic',name:'Cosmic',css:'linear-gradient(135deg,#4776e6 0%,#8e54e9 100%)' },
+  { id:'fire',name:'Fire',css:'linear-gradient(135deg,#f12711 0%,#f5af19 100%)' },
+  { id:'emerald',name:'Emerald',css:'linear-gradient(135deg,#348f50 0%,#56b4d3 100%)' },
+  { id:'royal',name:'Royal',css:'linear-gradient(135deg,#141e30 0%,#243b55 100%)' },
+  { id:'cherry',name:'Cherry',css:'linear-gradient(135deg,#eb3349 0%,#f45c43 100%)' },
+  { id:'mono-black',name:'Solid Hitam',css:'#000000' },
+  { id:'mono-white',name:'Solid Putih',css:'#f2f2f7' }
+];
+
+// ===== THEME HELPERS =====
+function hexToRgb(hex) {
+  hex = hex.replace('#','');
+  if (hex.length === 3) hex = hex.split('').map(c => c+c).join('');
+  const n = parseInt(hex, 16);
+  return ((n>>16)&255) + ', ' + ((n>>8)&255) + ', ' + (n&255);
+}
+function applyAccent(color) {
+  const rgb = hexToRgb(color);
+  document.documentElement.style.setProperty('--accent', color);
+  document.documentElement.style.setProperty('--accent-rgb', rgb);
+  localStorage.setItem(THEME_KEY, color);
+  document.querySelectorAll('.theme-swatch').forEach(s => s.classList.toggle('active', s.dataset.color === color));
+  const inp = document.getElementById('custom_accent'); if (inp) inp.value = color;
+}
+function applyBackground(bgId) {
+  const root = document.documentElement;
+  if (!bgId || bgId === 'default-dark' || bgId === 'default-light') {
+    root.style.removeProperty('--bg-custom');
+    if (bgId === 'default-light') applyMode('light');
+    if (bgId === 'default-dark')  applyMode('dark');
+    localStorage.setItem(BG_KEY, bgId || '');
+  } else if (bgId.startsWith('#')) {
+    root.style.setProperty('--bg-custom', bgId);
+    localStorage.setItem(BG_KEY, bgId);
+  } else {
+    const bg = BACKGROUNDS.find(b => b.id === bgId);
+    if (bg && bg.css) {
+      root.style.setProperty('--bg-custom', bg.css);
+      localStorage.setItem(BG_KEY, bgId);
     }
+  }
+  document.querySelectorAll('.bg-swatch').forEach(s => s.classList.toggle('active', s.dataset.bg === bgId));
+}
+function applyMode(mode) {
+  document.documentElement.setAttribute('data-theme', mode);
+  localStorage.setItem(MODE_KEY, mode);
+  const icon = document.querySelector('#btn_theme i');
+  if (icon) icon.className = mode === 'light' ? 'fas fa-sun' : 'fas fa-moon';
+  document.querySelectorAll('.mode-btn').forEach(b => b.classList.toggle('active', b.dataset.mode === mode));
+}
 
-    window.onload = function() {
-      const s = getSession();
-      if (s && s.nama) showApp(s.nama); else showLogin();
+async function loadGlobalTheme() {
+  applyMode(localStorage.getItem(MODE_KEY) || 'dark');
+  try {
+    const s = await gs('getSettings');
+    applyAccent(s.theme || localStorage.getItem(THEME_KEY) || '#0a84ff');
+    if (s.background) applyBackground(s.background);
+    else {
+      const local = localStorage.getItem(BG_KEY);
+      if (local) applyBackground(local);
+    }
+  } catch (e) {
+    applyAccent(localStorage.getItem(THEME_KEY) || '#0a84ff');
+    const local = localStorage.getItem(BG_KEY);
+    if (local) applyBackground(local);
+  }
+}
+
+// ===== SWAL =====
+function swalBase() {
+  const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+  return {
+    background: isLight ? '#fff' : '#1c1c1e',
+    color: isLight ? '#1c1c1e' : '#fff',
+    confirmButtonColor: getComputedStyle(document.documentElement).getPropertyValue('--accent').trim() || '#0a84ff',
+    cancelButtonColor: isLight ? '#aeaeb2' : '#3a3a3c'
+  };
+}
+const swal = opts => Swal.fire(Object.assign({}, swalBase(), opts));
+
+// ===== SESSION =====
+function getSession() { try { return JSON.parse(localStorage.getItem(SESSION_KEY)); } catch (e) { return null; } }
+function setSession(nama) { localStorage.setItem(SESSION_KEY, JSON.stringify({ nama: nama, loginAt: Date.now() })); }
+function clearSession() { localStorage.removeItem(SESSION_KEY); }
+
+// ===== BOOTSTRAP =====
+(async () => {
+  await loadGlobalTheme();
+  const session = getSession();
+  if (session && session.nama) await showApp(session.nama);
+  else showLogin();
+})();
+
+// ===== LOGIN =====
+function showLogin() {
+  document.getElementById('view_app').classList.add('hidden');
+  document.getElementById('view_login').classList.remove('hidden');
+  loadMembersDropdown();
+  setupPinInputs();
+}
+
+async function loadMembersDropdown() {
+  const select = document.getElementById('login_nama');
+  try {
+    cachedMembers = await gs('getMembersPublic');
+    select.innerHTML = '<option value="">-- Pilih Nama --</option>';
+    cachedMembers.forEach(m => {
+      const o = document.createElement('option');
+      o.value = m.key; o.textContent = m.displayName || m.key;
+      select.appendChild(o);
+    });
+  } catch (err) { swal({ title:'Error', text: err.message, icon:'error' }); }
+}
+
+function setupPinInputs() {
+  const boxes = document.querySelectorAll('.pin-box');
+  boxes.forEach((box, i) => {
+    box.value = '';
+    box.oninput = function () {
+      this.value = this.value.replace(/\D/g, '').slice(0, 1);
+      if (this.value && i < boxes.length - 1) boxes[i + 1].focus();
     };
-    function getSession() { try { return JSON.parse(localStorage.getItem(SESSION_KEY)); } catch(e) { return null; } }
-    function setSession(nama) { localStorage.setItem(SESSION_KEY, JSON.stringify({ nama, loginAt: new Date().toISOString() })); }
-    function clearSession() { localStorage.removeItem(SESSION_KEY); }
+    box.onkeydown = function (e) {
+      if (e.key === 'Backspace' && !this.value && i > 0) boxes[i - 1].focus();
+      if (e.key === 'Enter') doLogin();
+    };
+  });
+  setTimeout(() => boxes[0].focus(), 200);
+}
 
-    function showLogin() {
-      document.getElementById('view_app').classList.add('hidden');
-      document.getElementById('view_login').classList.remove('hidden');
-      loadMembers(); setupPinInputs();
-    }
-    async function loadMembers() {
-      const select = document.getElementById('login_nama');
-      try {
-        const data = await api('getMembers');
-        select.innerHTML = '<option value="">-- Pilih Nama --</option>';
-        data.forEach(n => { const o = document.createElement('option'); o.value = n; o.textContent = n; select.appendChild(o); });
-      } catch (err) { Swal.fire('Error', err.message, 'error'); }
-    }
-    function setupPinInputs() {
-      const boxes = document.querySelectorAll('.pin-box');
-      boxes.forEach((box, i) => {
-        box.value = '';
-        box.oninput = function() { this.value = this.value.replace(/\D/g, '').slice(0, 1); if (this.value && i < boxes.length - 1) boxes[i + 1].focus(); };
-        box.onkeydown = function(e) { if (e.key === 'Backspace' && !this.value && i > 0) boxes[i - 1].focus(); if (e.key === 'Enter') doLogin(); };
-      });
-      setTimeout(() => boxes[0].focus(), 100);
-    }
-    function getPinValue() { return Array.from(document.querySelectorAll('.pin-box')).map(b => b.value).join(''); }
+function getPinValue() {
+  return Array.from(document.querySelectorAll('.pin-box')).map(b => b.value).join('');
+}
 
-    async function doLogin() {
-      const nama = document.getElementById('login_nama').value;
-      const pin = getPinValue();
-      if (!nama) return Swal.fire('Oops!', 'Pilih nama dulu.', 'warning');
-      if (pin.length !== 4) return Swal.fire('Oops!', 'PIN harus 4 digit.', 'warning');
-      const btn = document.getElementById('btn_login');
-      const ori = btn.innerHTML;
-      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memeriksa...'; btn.disabled = true;
-      try {
-        const res = await api('validateLogin', { nama, pin });
-        if (res.success) {
-          setSession(res.nama);
-          Swal.fire({ title: 'Berhasil!', text: 'Selamat datang, ' + res.nama, icon: 'success', timer: 1200, showConfirmButton: false })
-            .then(() => showApp(res.nama));
-        } else {
-          Swal.fire('Login Gagal', res.message, 'error');
-          document.querySelectorAll('.pin-box').forEach(b => b.value = '');
-          document.querySelectorAll('.pin-box')[0].focus();
-        }
-      } catch (err) { Swal.fire('Error', err.message, 'error'); }
-      finally { btn.innerHTML = ori; btn.disabled = false; }
-    }
+async function doLogin() {
+  const nama = document.getElementById('login_nama').value;
+  const pin  = getPinValue();
+  if (!nama)                return swal({ title:'Oops', text:'Pilih nama dulu.', icon:'warning' });
+  if (!/^\d{4}$/.test(pin)) return swal({ title:'Oops', text:'PIN harus 4 digit.', icon:'warning' });
 
-    function showApp(nama) {
-      document.getElementById('view_login').classList.add('hidden');
-      document.getElementById('view_app').classList.remove('hidden');
-      document.getElementById('user_name').innerText = nama;
-      setupUangInputs();
-      switchTab('input');
+  const btn = document.getElementById('btn_login');
+  const ori = btn.innerHTML;
+  btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Memeriksa...';
+  btn.disabled = true;
+  try {
+    const res = await gs('validateLogin', { nama: nama, pin: pin });
+    if (!res.ok) {
+      swal({ title:'Login Gagal', text: res.message, icon:'error' });
+      document.querySelectorAll('.pin-box').forEach(b => b.value = '');
+      document.querySelectorAll('.pin-box')[0].focus();
+    } else {
+      setSession(res.member.key);
+      await swal({ title:'Berhasil!', text:'Hi, ' + res.member.displayName, icon:'success', timer:900, showConfirmButton:false });
+      await showApp(res.member.key);
     }
-    function doLogout() {
-      Swal.fire({ title: 'Logout?', text: 'Yakin mau keluar?', icon: 'question', showCancelButton: true, confirmButtonText: 'Ya, Logout', cancelButtonText: 'Batal', confirmButtonColor: '#dc2626' })
-        .then(res => { if (res.isConfirmed) { clearSession(); showLogin(); } });
-    }
+  } catch (err) { swal({ title:'Error', text: err.message, icon:'error' }); }
+  finally { btn.innerHTML = ori; btn.disabled = false; }
+}
 
-    function switchTab(tab) {
-      const unsel = "flex-1 py-3 px-2 text-[9px] font-black uppercase tracking-widest rounded-xl text-gray-500 hover:text-slate-800 transition-all whitespace-nowrap";
-      const sel = "flex-1 py-3 px-2 text-[9px] font-black uppercase tracking-widest rounded-xl bg-slate-800 text-white shadow-md transition-all whitespace-nowrap";
-      ['input','history','rank','chart'].forEach(t => {
-        document.getElementById('view_' + t).classList.add('hidden');
-        document.getElementById('nav_' + t).className = unsel;
-      });
-      document.getElementById('view_' + tab).classList.remove('hidden');
-      document.getElementById('nav_' + tab).className = sel;
-      if (tab === 'history') loadHistory();
-      if (tab === 'rank') loadRank();
-      if (tab === 'chart') loadChart();
-    }
+// ===== APP =====
+async function showApp(nama) {
+  document.getElementById('view_login').classList.add('hidden');
+  document.getElementById('view_app').classList.remove('hidden');
+  currentUser = nama;
+  try {
+    if (!cachedMembers.length) cachedMembers = await gs('getMembersPublic');
+    const m = cachedMembers.find(x => x.key === nama) || { key: nama, displayName: nama, isSuperUser: false, photo: '' };
+    isSuperUser = !!m.isSuperUser;
+    document.getElementById('user_name').innerText = m.displayName || nama;
+    renderAvatar(document.getElementById('user_avatar_wrap'), m.photo, m.displayName || nama);
+  } catch (e) {
+    isSuperUser = false;
+    document.getElementById('user_name').innerText = nama;
+  }
+  document.getElementById('tab_admin').classList.toggle('hidden', !isSuperUser);
+  document.getElementById('btn_export').classList.toggle('hidden', !isSuperUser);
+  setupUangInputs();
+  switchTab('input');
+}
 
-    function setupUangInputs() {
-      document.querySelectorAll('.uang-input').forEach(input => {
-        input.oninput = function() {
-          let v = this.value.replace(/[^,\d]/g, '');
-          this.value = v ? parseInt(v, 10).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".") : "";
-          hitungTotal();
-        };
-      });
-    }
-    function cleanNumber(str) { return str ? Number(str.replace(/\./g, '')) : 0; }
-    function hitungTotal() {
-      const t = cleanNumber(document.getElementById('val_device').value)
-              + cleanNumber(document.getElementById('val_accessories').value)
-              + cleanNumber(document.getElementById('val_qoala').value)
-              + cleanNumber(document.getElementById('val_telkomsel').value)
-              + cleanNumber(document.getElementById('val_indosat').value)
-              + cleanNumber(document.getElementById('val_xl').value);
-      document.getElementById('total_display').innerText = 'Rp ' + formatRp(t);
-      return t;
-    }
+function renderAvatar(el, photoUrl, name) {
+  if (!el) return;
+  if (photoUrl) {
+    el.outerHTML = '<img class="avatar" id="' + (el.id || '') + '" src="' + photoUrl + '" alt="' + name + '">';
+  } else {
+    const initial = (name || '?').trim().charAt(0).toUpperCase();
+    el.outerHTML = '<div class="avatar-fallback" id="' + (el.id || '') + '">' + initial + '</div>';
+  }
+}
 
-    async function submitForm() {
-      const session = getSession();
-      if (!session) return doLogout();
-      const btn = document.getElementById('btn_submit');
-      const ori = btn.innerHTML;
-      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...'; btn.disabled = true;
-      const payload = {
-        nama: session.nama,
-        device: cleanNumber(document.getElementById('val_device').value),
-        accessories: cleanNumber(document.getElementById('val_accessories').value),
-        qoala: cleanNumber(document.getElementById('val_qoala').value),
-        telkomsel: cleanNumber(document.getElementById('val_telkomsel').value),
-        indosat: cleanNumber(document.getElementById('val_indosat').value),
-        xl: cleanNumber(document.getElementById('val_xl').value),
-        airpods: Number(document.getElementById('val_airpods').value) || 0
+function doLogout() {
+  swal({ title:'Logout?', text:'Yakin keluar?', icon:'question', showCancelButton:true, confirmButtonText:'Ya, Logout', cancelButtonText:'Batal', confirmButtonColor:'#ff453a' })
+    .then(r => { if (r.isConfirmed) { clearSession(); location.reload(); } });
+}
+
+function switchTab(tab) {
+  ['input','history','rank','chart','admin'].forEach(t => {
+    const el = document.getElementById('view_' + t);
+    if (el) el.classList.add('hidden');
+  });
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  const v = document.getElementById('view_' + tab);
+  if (v) v.classList.remove('hidden');
+  const btn = document.querySelector('.tab-btn[data-tab="' + tab + '"]');
+  if (btn) btn.classList.add('active');
+  if (tab === 'history') loadHistory();
+  if (tab === 'rank')    loadRank();
+  if (tab === 'chart')   loadChart();
+  if (tab === 'admin')   loadAdmin();
+}
+
+// ===== INPUT FORM =====
+function setupUangInputs() {
+  document.querySelectorAll('.uang-input').forEach(input => {
+    input.oninput = function () {
+      let v = this.value.replace(/[^,\d]/g, '');
+      this.value = v ? parseInt(v, 10).toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.') : '';
+      hitungTotal();
+    };
+  });
+}
+function cleanNumber(str) { return str ? Number(str.replace(/\./g, '')) : 0; }
+function hitungTotal() {
+  const t = cleanNumber(document.getElementById('val_device').value)
+          + cleanNumber(document.getElementById('val_accessories').value)
+          + cleanNumber(document.getElementById('val_qoala').value)
+          + cleanNumber(document.getElementById('val_telkomsel').value)
+          + cleanNumber(document.getElementById('val_indosat').value)
+          + cleanNumber(document.getElementById('val_xl').value);
+  document.getElementById('total_display').innerText = 'Rp ' + formatRp(t);
+}
+
+async function submitForm() {
+  const session = getSession();
+  if (!session) return doLogout();
+  const btn = document.getElementById('btn_submit');
+  const ori = btn.innerHTML;
+  btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Menyimpan...';
+  btn.disabled = true;
+  const payload = {
+    nama: session.nama,
+    device:  cleanNumber(document.getElementById('val_device').value),
+    acc:     cleanNumber(document.getElementById('val_accessories').value),
+    qoala:   cleanNumber(document.getElementById('val_qoala').value),
+    tsel:    cleanNumber(document.getElementById('val_telkomsel').value),
+    isat:    cleanNumber(document.getElementById('val_indosat').value),
+    xl:      cleanNumber(document.getElementById('val_xl').value),
+    airpods: Number(document.getElementById('val_airpods').value) || 0
+  };
+  try {
+    await gs('submitSale', payload);
+    swal({ title:'Berhasil!', text:'Data tersimpan.', icon:'success', timer:1100, showConfirmButton:false });
+    document.querySelectorAll('.uang-input').forEach(i => i.value = '');
+    document.getElementById('val_airpods').value = '';
+    hitungTotal();
+  } catch (err) { swal({ title:'Error', text: err.message, icon:'error' }); }
+  finally { btn.innerHTML = ori; btn.disabled = false; }
+}
+
+// ===== HISTORY =====
+async function loadHistory() {
+  const limit = parseInt(document.getElementById('limit_history').value, 10);
+  const c = document.getElementById('history_container');
+  c.innerHTML = '<div class="loading"><i class="fas fa-circle-notch fa-spin"></i></div>';
+  try {
+    const arg = isSuperUser ? { limit: limit } : { limit: limit, filterUser: currentUser };
+    const items = await gs('getHistory', arg);
+    if (!items.length) { c.innerHTML = '<div class="empty-state">Belum ada histori.</div>'; return; }
+    let html = '';
+    items.forEach(item => {
+      const delBtn = isSuperUser
+        ? '<button class="hist-del" data-del="' + item.id + '|' + item.nama + '|' + item.tanggal + '" title="Hapus"><i class="fas fa-trash"></i></button>' : '';
+      html += '<div class="history-card glass">' +
+        '<div class="history-card-head">' +
+          '<div><p class="name">' + item.nama + '</p><p class="meta">' + item.tanggal + ' &bull; ' + item.waktu + '</p></div>' +
+          '<div class="hist-head-acts">' + delBtn + '</div>' +
+        '</div>' +
+        '<div class="history-grid">' +
+          '<div class="history-item" data-edit="' + item.id + '|device|Device|' + item.device + '"><span class="key">Device</span><span class="value">' + formatRp(item.device) + ' <i class="fas fa-pen" style="font-size:9px"></i></span></div>' +
+          '<div class="history-item" data-edit="' + item.id + '|acc|Accessories|' + item.acc + '"><span class="key">Acc</span><span class="value">' + formatRp(item.acc) + ' <i class="fas fa-pen" style="font-size:9px"></i></span></div>' +
+          '<div class="history-item" data-edit="' + item.id + '|qoala|Qoala|' + item.qoala + '"><span class="key">Qoala</span><span class="value">' + formatRp(item.qoala) + ' <i class="fas fa-pen" style="font-size:9px"></i></span></div>' +
+          '<div class="history-item" data-edit="' + item.id + '|tsel|Telkomsel|' + item.tsel + '"><span class="key">Tsel</span><span class="value">' + formatRp(item.tsel) + ' <i class="fas fa-pen" style="font-size:9px"></i></span></div>' +
+          '<div class="history-item" data-edit="' + item.id + '|isat|Indosat|' + item.isat + '"><span class="key">Isat</span><span class="value">' + formatRp(item.isat) + ' <i class="fas fa-pen" style="font-size:9px"></i></span></div>' +
+          '<div class="history-item" data-edit="' + item.id + '|xl|XL|' + item.xl + '"><span class="key">XL</span><span class="value">' + formatRp(item.xl) + ' <i class="fas fa-pen" style="font-size:9px"></i></span></div>' +
+          '<div class="history-item airpods" data-edit="' + item.id + '|airpods|Airpods (Qty)|' + item.airpods + '"><span class="key">Airpods (Qty)</span><span class="value">' + item.airpods + ' <i class="fas fa-pen" style="font-size:9px"></i></span></div>' +
+        '</div>' +
+      '</div>';
+    });
+    c.innerHTML = html;
+    c.querySelectorAll('[data-edit]').forEach(el => {
+      el.onclick = () => {
+        const parts = el.dataset.edit.split('|');
+        promptEdit(parts[0], parts[1], parts[2], Number(parts[3]), items);
       };
-      try {
-        const res = await api('submitData', payload);
-        Swal.fire({ title: 'Berhasil!', text: res.message, icon: 'success', confirmButtonColor: '#000' });
-        document.querySelectorAll('.uang-input').forEach(i => i.value = '');
-        document.getElementById('val_airpods').value = '';
-        hitungTotal();
-      } catch (err) { Swal.fire('Error', err.message, 'error'); }
-      finally { btn.innerHTML = ori; btn.disabled = false; }
-    }
+    });
+    c.querySelectorAll('[data-del]').forEach(el => {
+      el.onclick = e => {
+        e.stopPropagation();
+        const parts = el.dataset.del.split('|');
+        deleteHistory(parts[0], parts[1], parts[2]);
+      };
+    });
+  } catch (err) { c.innerHTML = '<div class="empty-state" style="color:#ff453a">' + err.message + '</div>'; }
+}
 
-    async function loadHistory() {
-      const limit = document.getElementById('limit_history').value;
-      const c = document.getElementById('history_container');
-      c.innerHTML = '<p class="text-center text-gray-400 py-10"><i class="fas fa-spinner fa-spin text-2xl"></i></p>';
-      try {
-        const res = await api('getHistory', { limit });
-        let html = '';
-        res.forEach(item => {
-          html += `<div class="bg-gray-50 rounded-xl border border-gray-200 p-4"><div class="flex justify-between items-end border-b border-gray-200 pb-2 mb-2"><div><p class="text-sm font-extrabold text-gray-800">${item.staff}</p><p class="text-[10px] text-gray-500 font-semibold">${item.tanggal} • ${item.waktu}</p></div><span class="text-[9px] font-black bg-gray-200 text-gray-600 px-2 py-1 rounded">BARIS ${item.row}</span></div><div class="grid grid-cols-2 gap-x-4 gap-y-1 text-[11px] font-bold"><div class="flex justify-between py-1 cursor-pointer hover:bg-gray-200 rounded px-1" onclick="promptEdit(${item.row},'device','Device',${item.device})"><span class="text-gray-500">Device</span><span class="text-blue-600">${formatRp(item.device)} <i class="fas fa-pen text-[9px]"></i></span></div><div class="flex justify-between py-1 cursor-pointer hover:bg-gray-200 rounded px-1" onclick="promptEdit(${item.row},'acc','Accessories',${item.acc})"><span class="text-gray-500">Acc</span><span class="text-blue-600">${formatRp(item.acc)} <i class="fas fa-pen text-[9px]"></i></span></div><div class="flex justify-between py-1 cursor-pointer hover:bg-gray-200 rounded px-1" onclick="promptEdit(${item.row},'qoala','Qoala',${item.qoala})"><span class="text-gray-500">Qoala</span><span class="text-blue-600">${formatRp(item.qoala)} <i class="fas fa-pen text-[9px]"></i></span></div><div class="flex justify-between py-1 cursor-pointer hover:bg-gray-200 rounded px-1" onclick="promptEdit(${item.row},'tsel','Telkomsel',${item.tsel})"><span class="text-gray-500">Tsel</span><span class="text-blue-600">${formatRp(item.tsel)} <i class="fas fa-pen text-[9px]"></i></span></div><div class="flex justify-between py-1 cursor-pointer hover:bg-gray-200 rounded px-1" onclick="promptEdit(${item.row},'isat','Indosat',${item.isat})"><span class="text-gray-500">Isat</span><span class="text-blue-600">${formatRp(item.isat)} <i class="fas fa-pen text-[9px]"></i></span></div><div class="flex justify-between py-1 cursor-pointer hover:bg-gray-200 rounded px-1" onclick="promptEdit(${item.row},'xl','XL',${item.xl})"><span class="text-gray-500">XL</span><span class="text-blue-600">${formatRp(item.xl)} <i class="fas fa-pen text-[9px]"></i></span></div><div class="col-span-2 flex justify-between bg-orange-100 py-1 mt-1 cursor-pointer hover:bg-orange-200 rounded px-2" onclick="promptEdit(${item.row},'airpods','Airpods (Qty)',${item.airpods})"><span class="text-orange-600">Airpods (Qty)</span><span class="text-orange-600">${item.airpods} <i class="fas fa-pen text-[9px]"></i></span></div></div></div>`;
-        });
-        if (!html) html = '<p class="text-center text-gray-500 text-sm py-4">Belum ada histori.</p>';
-        c.innerHTML = html;
-      } catch (err) { c.innerHTML = '<p class="text-center text-red-500 text-sm py-4">' + err.message + '</p>'; }
-    }
+async function deleteHistory(id, nama, tanggal) {
+  if (!isSuperUser) return;
+  const r = await swal({
+    title:'Hapus Histori?',
+    html:'Yakin hapus data <b>' + nama + '</b><br>tanggal <b>' + tanggal + '</b>?<br><small style="opacity:0.6">Tidak bisa dibatalkan.</small>',
+    icon:'warning', showCancelButton:true,
+    confirmButtonText:'Ya, Hapus', cancelButtonText:'Batal', confirmButtonColor:'#ff453a'
+  });
+  if (!r.isConfirmed) return;
+  swal({ title:'Menghapus...', allowOutsideClick:false, didOpen: () => Swal.showLoading() });
+  try {
+    await gs('deleteSale', id);
+    swal({ title:'Dihapus', icon:'success', timer:700, showConfirmButton:false });
+    loadHistory();
+  } catch (err) { swal({ title:'Error', text: err.message, icon:'error' }); }
+}
 
-    function promptEdit(row, col, label, oldVal) {
-      Swal.fire({ title: `Koreksi ${label}`, text: `Ketik angka baru. Angka lama: ${oldVal}`, input: 'number', inputValue: oldVal, showCancelButton: true, confirmButtonText: 'Simpan', confirmButtonColor: '#000', cancelButtonText: 'Batal' })
-        .then(async (r) => {
-          if (r.isConfirmed) {
-            Swal.fire({ title: 'Memproses...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
-            try {
-              const res = await api('updateTransaction', { row, col, value: Number(r.value) });
-              Swal.fire({ title: 'Sukses', text: res.message, icon: 'success', confirmButtonColor: '#000' });
-              loadHistory();
-            } catch (err) { Swal.fire('Error', err.message, 'error'); }
-          }
-        });
+async function promptEdit(id, col, label, oldVal, items) {
+  if (!isSuperUser) {
+    const own = items.find(x => x.id === id);
+    if (!own || own.nama !== currentUser) {
+      return swal({ title:'Tidak diizinkan', text:'Hanya bisa mengedit data sendiri.', icon:'warning' });
     }
+  }
+  const r = await swal({
+    title:'Koreksi ' + label, text:'Angka lama: ' + oldVal,
+    input:'number', inputValue: oldVal,
+    showCancelButton:true, confirmButtonText:'Simpan', cancelButtonText:'Batal'
+  });
+  if (!r.isConfirmed) return;
+  swal({ title:'Memproses...', allowOutsideClick:false, didOpen: () => Swal.showLoading() });
+  try {
+    await gs('updateSaleField', { id: id, field: col, value: Number(r.value) || 0 });
+    swal({ title:'Sukses', icon:'success', timer:700, showConfirmButton:false });
+    loadHistory();
+  } catch (err) { swal({ title:'Error', text: err.message, icon:'error' }); }
+}
 
-    async function loadRank() {
-      const c = document.getElementById('rank_container');
-      c.innerHTML = '<p class="text-center text-gray-400 py-10"><i class="fas fa-spinner fa-spin text-2xl"></i></p>';
-      try {
-        const res = await api('getLeaderboard');
-        let html = '';
-        res.forEach((item, i) => {
-          let badge = `<span class="font-black text-gray-400 text-lg w-6 text-center">${i + 1}</span>`;
-          if (i === 0) badge = `<i class="fas fa-medal text-yellow-500 text-2xl w-6 text-center"></i>`;
-          if (i === 1) badge = `<i class="fas fa-medal text-gray-400 text-2xl w-6 text-center"></i>`;
-          if (i === 2) badge = `<i class="fas fa-medal text-amber-600 text-2xl w-6 text-center"></i>`;
-          html += `<div class="bg-gray-50 rounded-xl p-3 mb-2 flex items-center gap-3 border border-gray-100">${badge}<div class="flex-1 border-l-2 border-gray-200 pl-3"><p class="font-extrabold text-gray-800">${item.name}</p><p class="text-[10px] text-orange-600 font-bold mt-0.5"><i class="fas fa-headphones"></i> ${item.airpods} Airpods</p></div><div class="text-right"><p class="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Penjualan</p><p class="font-black text-blue-600 text-sm">Rp ${formatRp(item.total)}</p></div></div>`;
-        });
-        if (!html) html = '<p class="text-center text-gray-500 py-4 text-sm">Belum ada data.</p>';
-        c.innerHTML = html;
-      } catch (err) { c.innerHTML = '<p class="text-center text-red-500 py-4 text-sm">' + err.message + '</p>'; }
-    }
+// ===== RANK =====
+async function loadRank() {
+  const c = document.getElementById('rank_container');
+  c.innerHTML = '<div class="loading"><i class="fas fa-circle-notch fa-spin"></i></div>';
+  try {
+    const arr = await gs('getLeaderboard');
+    if (!arr.length) { c.innerHTML = '<div class="empty-state">Belum ada data.</div>'; return; }
+    let html = '';
+    arr.forEach((item, i) => {
+      let badge = '<span style="color:' + (i<3?'var(--ios-text)':'var(--ios-text-3)') + '">' + (i + 1) + '</span>';
+      if (i === 0) badge = '<i class="fas fa-medal" style="color:#ffd60a"></i>';
+      if (i === 1) badge = '<i class="fas fa-medal" style="color:#aeaeb2"></i>';
+      if (i === 2) badge = '<i class="fas fa-medal" style="color:#a2734c"></i>';
+      const avatarHtml = item.photo
+        ? '<img class="avatar" src="' + item.photo + '" alt="">'
+        : '<div class="avatar-fallback">' + item.displayName.charAt(0).toUpperCase() + '</div>';
+      html += '<div class="rank-card glass">' +
+        '<div class="rank-badge">' + badge + '</div>' +
+        avatarHtml +
+        '<div class="rank-info"><p class="name">' + item.displayName + '</p><p class="sub"><i class="fas fa-headphones"></i> ' + item.airpods + ' Airpods</p></div>' +
+        '<div class="rank-total"><p class="l">Penjualan</p><p class="v">Rp ' + formatRp(item.total) + '</p></div>' +
+      '</div>';
+    });
+    c.innerHTML = html;
+  } catch (err) { c.innerHTML = '<div class="empty-state" style="color:#ff453a">' + err.message + '</div>'; }
+}
 
-    async function loadChart() {
-      try {
-        const res = await api('getMonthlyChartData');
-        const ctx = document.getElementById('monthlyChart').getContext('2d');
-        if (myChart) myChart.destroy();
-        myChart = new Chart(ctx, {
-          type: 'bar',
-          data: { labels: res.labels, datasets: [{ label: 'Total Penjualan (Rp)', data: res.data, backgroundColor: '#1e293b', borderRadius: 6 }] },
-          options: {
-            responsive: true,
-            plugins: { legend: { display: false } },
-            scales: {
-              y: { beginAtZero: true, ticks: { callback: v => v >= 1000000 ? (v/1000000) + ' Jt' : v >= 1000 ? (v/1000) + ' Rb' : v, font: { size: 10 } } },
-              x: { grid: { display: false }, ticks: { font: { size: 10 } } }
-            }
-          }
-        });
-      } catch (err) { Swal.fire('Error', err.message, 'error'); }
+// ===== CHART =====
+async function loadChart() {
+  try {
+    const arg = isSuperUser ? {} : { filterUser: currentUser };
+    const res = await gs('getMonthlyChart', arg);
+    const labels = res.labels;
+    const data = res.data;
+    const ctx = document.getElementById('monthlyChart').getContext('2d');
+    if (myChart) myChart.destroy();
+    const accent = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim() || '#0a84ff';
+    const accentRgb = getComputedStyle(document.documentElement).getPropertyValue('--accent-rgb').trim() || '10, 132, 255';
+    const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+    myChart = new Chart(ctx, {
+      type:'bar',
+      data: { labels: labels, datasets: [{
+        label:'Total (Rp)', data: data,
+        backgroundColor: c => {
+          const g = c.chart.ctx.createLinearGradient(0, 0, 0, 300);
+          g.addColorStop(0, accent); g.addColorStop(1, 'rgba(' + accentRgb + ', 0.2)');
+          return g;
+        },
+        borderRadius: 8, borderSkipped: false
+      }]},
+      options: {
+        responsive: true,
+        plugins: { legend: { display: false } },
+        scales: {
+          y: { beginAtZero: true,
+               grid: { color: isLight ? 'rgba(0,0,0,0.05)' : 'rgba(255,255,255,0.05)' },
+               ticks: { color: isLight ? '#666' : '#999',
+                        callback: v => v >= 1000000 ? (v/1000000) + 'Jt' : v >= 1000 ? (v/1000) + 'Rb' : v,
+                        font: { size: 10 } } },
+          x: { grid: { display: false }, ticks: { color: isLight ? '#666' : '#999', font: { size: 10 } } }
+        }
+      }
+    });
+  } catch (err) { swal({ title:'Error', text: err.message, icon:'error' }); }
+}
+
+// ===== ADMIN =====
+async function loadAdmin() {
+  if (!isSuperUser) return;
+  const grid = document.getElementById('theme_grid');
+  grid.innerHTML = THEMES.map(t => '<div class="theme-swatch" data-color="' + t.color + '" title="' + t.name + '" style="background: linear-gradient(135deg, ' + t.color + ' 0%, ' + t.color + '99 100%);"></div>').join('');
+  grid.querySelectorAll('.theme-swatch').forEach(sw => {
+    sw.onclick = async () => {
+      applyAccent(sw.dataset.color);
+      try { await gs('setSetting', { key:'theme', value: sw.dataset.color }); } catch (e) {}
+    };
+  });
+
+  const bgGrid = document.getElementById('bg_grid');
+  bgGrid.innerHTML = BACKGROUNDS.map(b => {
+    const preview = b.type === 'default' ? (b.mode === 'light' ? '#f2f2f7' : '#000') : b.css;
+    return '<div class="bg-swatch" data-bg="' + b.id + '" title="' + b.name + '" style="background: ' + preview + ';"></div>';
+  }).join('');
+  bgGrid.querySelectorAll('.bg-swatch').forEach(sw => {
+    sw.onclick = async () => {
+      applyBackground(sw.dataset.bg);
+      try { await gs('setSetting', { key:'background', value: sw.dataset.bg }); } catch (e) {}
+    };
+  });
+
+  const customAccent = document.getElementById('custom_accent');
+  const curAccent = localStorage.getItem(THEME_KEY) || '#0a84ff';
+  customAccent.value = curAccent.startsWith('#') ? curAccent : '#0a84ff';
+  customAccent.oninput  = () => applyAccent(customAccent.value);
+  customAccent.onchange = async () => { try { await gs('setSetting', { key:'theme', value: customAccent.value }); } catch (e) {} };
+  document.getElementById('reset_accent').onclick = async () => {
+    applyAccent('#0a84ff');
+    try { await gs('setSetting', { key:'theme', value:'#0a84ff' }); } catch (e) {}
+  };
+
+  const customBg = document.getElementById('custom_bg');
+  const cur = localStorage.getItem(BG_KEY) || '';
+  if (cur.startsWith('#')) customBg.value = cur;
+  customBg.oninput  = () => applyBackground(customBg.value);
+  customBg.onchange = async () => { try { await gs('setSetting', { key:'background', value: customBg.value }); } catch (e) {} };
+  document.getElementById('reset_bg').onclick = async () => {
+    applyBackground('');
+    try { await gs('deleteSetting', 'background'); } catch (e) {}
+  };
+
+  applyMode(localStorage.getItem(MODE_KEY) || 'dark');
+
+  await renderMemberList();
+
+  const selM = document.getElementById('filter_member');
+  try {
+    const list = await gs('getMembersPublic');
+    selM.innerHTML = '<option value="">Semua Anggota</option>';
+    list.forEach(m => {
+      if (m.isSuperUser) return;
+      const o = document.createElement('option');
+      o.value = m.key; o.textContent = m.displayName || m.key;
+      selM.appendChild(o);
+    });
+  } catch (e) {}
+}
+
+async function renderMemberList() {
+  const c = document.getElementById('member_list');
+  c.innerHTML = '<div class="loading"><i class="fas fa-circle-notch fa-spin"></i></div>';
+  try {
+    const list = await gs('getMembersPublic');
+    cachedMembers = list;
+    if (!list.length) { c.innerHTML = '<div class="empty-state">Belum ada anggota.</div>'; return; }
+    let html = '';
+    list.forEach(m => {
+      const avatarHtml = m.photo
+        ? '<img class="avatar" src="' + m.photo + '" alt="">'
+        : '<div class="avatar-fallback">' + (m.displayName || m.key).charAt(0).toUpperCase() + '</div>';
+      const isSU = m.isSuperUser;
+      html += '<div class="member-row">' +
+        avatarHtml +
+        '<div class="info">' +
+          '<p class="nm">' + (m.displayName || m.key) + '</p>' +
+          '<p class="rl">@' + m.key + (isSU ? ' &bull; <span style="color:var(--accent)">Super User</span>' : '') + '</p>' +
+        '</div>' +
+        '<div class="acts">' +
+          '<button class="mini-btn" data-act="photo" data-key="' + m.key + '" title="Foto"><i class="fas fa-camera"></i></button>' +
+          '<button class="mini-btn" data-act="name"  data-key="' + m.key + '" title="Nama"><i class="fas fa-pen"></i></button>' +
+          '<button class="mini-btn" data-act="pin"   data-key="' + m.key + '" title="PIN"><i class="fas fa-key"></i></button>' +
+          (isSU ? '' : '<button class="mini-btn danger" data-act="del" data-key="' + m.key + '" title="Hapus"><i class="fas fa-trash"></i></button>') +
+        '</div>' +
+      '</div>';
+    });
+    c.innerHTML = html;
+    c.querySelectorAll('[data-act]').forEach(b => {
+      b.onclick = () => memberAction(b.dataset.act, b.dataset.key);
+    });
+  } catch (err) { c.innerHTML = '<div class="empty-state" style="color:#ff453a">' + err.message + '</div>'; }
+}
+
+async function memberAction(act, key) {
+  if (act === 'del') {
+    const r = await swal({ title:'Hapus ' + key + '?', text:'Anggota akan dihapus permanen.', icon:'warning', showCancelButton:true, confirmButtonText:'Ya, Hapus', cancelButtonText:'Batal', confirmButtonColor:'#ff453a' });
+    if (!r.isConfirmed) return;
+    try { await gs('deleteMember', key); swal({ title:'Dihapus', icon:'success', timer:700, showConfirmButton:false }); renderMemberList(); }
+    catch (e) { swal({ title:'Error', text: e.message, icon:'error' }); }
+    return;
+  }
+  if (act === 'name') {
+    const cur = cachedMembers.find(x => x.key === key);
+    const r = await swal({ title:'Ganti Nama Tampilan', input:'text', inputValue: (cur && cur.displayName) || key, showCancelButton:true, confirmButtonText:'Simpan', cancelButtonText:'Batal' });
+    if (!r.isConfirmed || !r.value) return;
+    try { await gs('updateMemberField', { key: key, field:'displayName', value: r.value.trim() }); swal({ title:'Tersimpan', icon:'success', timer:700, showConfirmButton:false }); renderMemberList(); }
+    catch (e) { swal({ title:'Error', text: e.message, icon:'error' }); }
+    return;
+  }
+  if (act === 'pin') {
+    const r = await swal({ title:'Ganti PIN untuk ' + key, input:'text', inputAttributes:{ maxlength:4, inputmode:'numeric' }, inputPlaceholder:'4 digit', showCancelButton:true, confirmButtonText:'Simpan', cancelButtonText:'Batal' });
+    if (!r.isConfirmed) return;
+    if (!/^\d{4}$/.test(r.value || '')) return swal({ title:'Format salah', text:'PIN harus 4 digit.', icon:'warning' });
+    try { await gs('updateMemberField', { key: key, field:'pin', value: r.value }); swal({ title:'PIN diubah', icon:'success', timer:700, showConfirmButton:false }); }
+    catch (e) { swal({ title:'Error', text: e.message, icon:'error' }); }
+    return;
+  }
+  if (act === 'photo') {
+    pickAndUploadPhoto(key);
+  }
+}
+
+function pickAndUploadPhoto(key) {
+  const inp = document.createElement('input');
+  inp.type = 'file'; inp.accept = 'image/*';
+  inp.onchange = async () => {
+    const file = inp.files[0]; if (!file) return;
+    try {
+      swal({ title:'Memproses foto...', allowOutsideClick:false, didOpen: () => Swal.showLoading() });
+      const dataUrl = await resizeImage(file, 240);
+      await gs('updateMemberField', { key: key, field:'photo', value: dataUrl });
+      swal({ title:'Foto diperbarui', icon:'success', timer:700, showConfirmButton:false });
+      renderMemberList();
+    } catch (e) { swal({ title:'Error', text: e.message, icon:'error' }); }
+  };
+  inp.click();
+}
+
+function resizeImage(file, maxSize) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        let w = img.width, h = img.height;
+        if (w > h) { if (w > maxSize) { h *= maxSize / w; w = maxSize; } }
+        else       { if (h > maxSize) { w *= maxSize / h; h = maxSize; } }
+        canvas.width = w; canvas.height = h;
+        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+        resolve(canvas.toDataURL('image/jpeg', 0.78));
+      };
+      img.onerror = reject;
+      img.src = reader.result;
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+async function doAddMember() {
+  const r = await swal({
+    title:'Tambah Anggota',
+    html:
+      '<input id="sw_key"  class="swal2-input" placeholder="Username (huruf kecil, tanpa spasi)">' +
+      '<input id="sw_name" class="swal2-input" placeholder="Nama tampilan">' +
+      '<input id="sw_pin"  class="swal2-input" placeholder="PIN 4 digit" maxlength="4" inputmode="numeric">',
+    showCancelButton:true, confirmButtonText:'Tambah', cancelButtonText:'Batal',
+    focusConfirm:false,
+    preConfirm: () => {
+      const key  = document.getElementById('sw_key').value.trim().toLowerCase().replace(/\s+/g,'');
+      const name = document.getElementById('sw_name').value.trim();
+      const pin  = document.getElementById('sw_pin').value.trim();
+      if (!key || !/^[a-z0-9_]+$/.test(key)) { Swal.showValidationMessage('Username hanya huruf kecil/angka/underscore'); return false; }
+      if (!name) { Swal.showValidationMessage('Nama wajib diisi'); return false; }
+      if (!/^\d{4}$/.test(pin)) { Swal.showValidationMessage('PIN harus 4 digit angka'); return false; }
+      return { key: key, name: name, pin: pin };
     }
-  </script>
+  });
+  if (!r.isConfirmed) return;
+  try {
+    await gs('addMember', r.value);
+    swal({ title:'Ditambahkan', icon:'success', timer:800, showConfirmButton:false });
+    renderMemberList();
+  } catch (e) { swal({ title:'Error', text: e.message, icon:'error' }); }
+}
+
+// ===== EXPORT =====
+async function exportExcel() {
+  swal({ title:'Menyiapkan file...', allowOutsideClick:false, didOpen: () => Swal.showLoading() });
+  try {
+    const filterMember = (document.getElementById('filter_member') || {}).value || '';
+    const filterMonth  = (document.getElementById('filter_month')  || {}).value || '';
+    const rows = await gs('getExportRows', { filterMember: filterMember, filterMonth: filterMonth });
+    if (!rows.length) { Swal.close(); return swal({ title:'Kosong', text:'Tidak ada data untuk diexport.', icon:'info' }); }
+    const ws = XLSX.utils.json_to_sheet(rows);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Penjualan');
+    XLSX.writeFile(wb, 'Digimap_Penjualan_' + new Date().toISOString().slice(0,10) + '.xlsx');
+    Swal.close();
+  } catch (err) { swal({ title:'Error', text: err.message, icon:'error' }); }
+}
+
+async function openSpreadsheet() {
+  try {
+    const url = await gs('getSpreadsheetUrl');
+    window.open(url, '_blank');
+  } catch (err) { swal({ title:'Error', text: err.message, icon:'error' }); }
+}
+
+// ===== EVENT BINDINGS =====
+document.getElementById('btn_login').onclick  = doLogin;
+document.getElementById('btn_logout').onclick = doLogout;
+document.getElementById('btn_submit').onclick = submitForm;
+document.getElementById('btn_export').onclick = exportExcel;
+document.getElementById('limit_history').onchange = loadHistory;
+document.querySelectorAll('.tab-btn').forEach(b => b.onclick = () => switchTab(b.dataset.tab));
+
+document.getElementById('btn_theme').onclick = () => {
+  const cur = document.documentElement.getAttribute('data-theme') || 'dark';
+  applyMode(cur === 'dark' ? 'light' : 'dark');
+};
+
+document.getElementById('btn_add_member').onclick   = () => { if (isSuperUser) doAddMember(); };
+document.getElementById('btn_export_xlsx').onclick  = () => { if (isSuperUser) exportExcel(); };
+document.getElementById('btn_open_sheet').onclick   = () => { if (isSuperUser) openSpreadsheet(); };
+document.addEventListener('click', e => {
+  const btn = e.target.closest('.mode-btn');
+  if (btn) applyMode(btn.dataset.mode);
+});
+</script>
 </body>
 </html>
